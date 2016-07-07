@@ -1,0 +1,63 @@
+@red: #EC6F69;
+@redBorder: #DE3932;
+@green: #A6C659;
+@greenBorder: #7DAD0A;
+
+a{
+	background-color:inherit;
+}
+a:hover{
+	background-color:#222;
+	cursor:pointer;
+}
+
+#glava{
+
+	background-color: rgba(34,34,34,0.97);
+	height:65px;
+	line-height: 65px;
+}
+
+#glava-naslov{
+	display: inline-block;
+  	vertical-align: middle;
+	font-weight: bold;
+	font-size:24px;
+	color:white;
+	line-height: normal;
+	margin-left:1%;
+}
+
+#glavni-container{
+	position: absolute;
+	left:0;
+	right:0;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #111;
+    text-decoration: none;
+    color:white;
+}
