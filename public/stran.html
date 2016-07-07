@@ -15,14 +15,20 @@
          background-color: #259CEC;
          }
       </style>
+      <script>
+         $('#BSbtninfo').filestyle({
+         buttonName : 'btn-info', 
+         buttonText : ' Select a File'
+         });
+      </script>
       <link rel="stylesheet" href="css/style.css">
    </head>
    <body >
       <div id="cointainer-glava" class=".container">
          <div id="glava" class="row" style="position:fixed; left:15px; z-index:5;width:100%; height:75px;">
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-               <a href="index.html"><span id="glava-naslov" style="margin-top:15px;"><b>Imenik zaposlenih</b></span></a>
-               
+               <a ><span id="glava-naslov" class="kategorija1" style="margin-top:15px;"><b>Imenik zaposlenih</b></span></a>
+               <a ><span class="menu-povezava" style="position:fixed; right:30px; top:8px;"> <span class="glyphicon glyphicon-log-out" style="font-size:17px; "></span> Odjava</span></a>
             </div>
          </div>
       </div>
@@ -36,16 +42,26 @@
                      <li><a id="povezava-Domov" class="active kategorija">Domov</a></li>
                      <li><a id="povezava-DodajNovVpis" class="kategorija">Dodaj nov vpis</a></li>
                      <li><a id="povezava-Skupine" class="kategorija">Skupine</a></li>
-                     <li><a id="povezava-Uvozi/Izvozi" class="kategorija">Uvozi/Izvozi</a></li>
+                     <!--           <li><a id="povezava-uvozi-izvozi" class="kategorija">Uvozi/Izvozi</a></li> -->
                   </ul>
                </div>
                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-               <!-- DOMOV -->
+                  <!-- DOMOV -->
                   <div id="domov" class="menu" style="margin-top:20px;">
-                     <span>
-                     <input type="text" name="iskalnik"> 
-                     <button class="btn btn-sm btn-default"><span class="glyphicon glyphicon-search" style="margin-right:5px;"></span>Poišči</button>
-                     </span>
+                     <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                           <span>
+                           <input type="text" name="iskalnik"> 
+                           <button class="btn btn-sm btn-default"><span class="glyphicon glyphicon-search" style="margin-right:5px;"></span>Poišči</button> 
+                           </span>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+                           <span style="float:right;">
+                           <button class="btn btn-success btn-sm" >Pošlji E-mail</button>
+                           <button class="btn btn-danger btn-sm" >Izbriši</button>
+                           </span>
+                        </div>
+                     </div>
                      <table class="table table-hover table-bordered" style="margin-top:20px; margin-bottom:s0px;">
                         <thead>
                            <tr style="background-color:rgba(37, 156, 236, 0.5)">
@@ -53,6 +69,7 @@
                               <th>Ime</th>
                               <th>Priimek</th>
                               <th>Naslov</th>
+                              <th>Skupina</th>
                               <th>E-mail naslovi</th>
                               <th>Mob. št.</th>
                               <th>Kratka mob. št.</th>
@@ -66,8 +83,8 @@
                               <td><input type="checkbox"></td>
                               <td>Matevž</td>
                               <td>Železnik</td>
-                              
                               <td>Pivka</td>
+                              <td>IT</td>
                               <td>matevz.zeleznik@pivkap.si</td>
                               <td>
                                  <span style="display:block;">051 684 319<span>
@@ -85,8 +102,8 @@
                               <td><input type="checkbox"></td>
                               <td>Matevž</td>
                               <td>Železnik</td>
-                              
                               <td>Pivka</td>
+                              <td>IT</td>
                               <td>matevz.zeleznik@pivkap.si</td>
                               <td>
                                  <span style="display:block;">051 684 319<span>
@@ -104,8 +121,8 @@
                               <td><input type="checkbox"></td>
                               <td>Matevž</td>
                               <td>Železnik</td>
-                              
                               <td>Pivka</td>
+                              <td>IT</td>
                               <td>matevz.zeleznik@pivkap.si</td>
                               <td>
                                  <span style="display:block;">051 684 319<span>
@@ -125,13 +142,39 @@
                      <input type="checkbox" style="margin-right:10px; margin-top:0px;padding-top:0px;">
                      <span style="margin-bottom:10px;">Označi vse</span>
                      </span>
-                     <span style="display:block; margin-top:10px;">
-                     <button class="btn btn-success btn-sm" >Pošlji E-mail</button>
-                     <button class="btn btn-danger btn-sm" >Izbriši</button>
-                     </span>
+                     <div class="row">
+                     	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		                     <div style="margin-top:20px;">
+		                        <span>
+		                           Premakni izbrane v skupino
+		                           <select>
+		                              <option value="null"></option>
+		                              <option value="IT">Informatika</option>
+		                              <option value="krmila">Krmila</option>
+		                           </select>
+		                        </span>
+		                        <button class="btn btn-success btn-sm" style="margin-left:8px;"> Potrdi</button>
+		                     </div>
+		                    
+		                  </div>
+		                  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+			                  <table class="table table-hover" style="margin-top:20px;">
+			                        <tbody>
+			                           <tr style="border:0;">
+			                              <td><span>Izvozi CSV datoteko z izbranimi zaposlenimi </span></td>
+			                              <td><button class="btn btn-sm btn-primary">Izvozi</button></td>
+			                           </tr>
+			                           <tr style="border:0;">
+			                              <td><span>Izvozi CSV datoteko vseh zaposlenih </span></td>
+			                              <td><button class="btn btn-sm btn-primary">Izvozi</button></td>
+			                           </tr>
+			                        </tbody>
+			                     </table>
+		                  </div>
+		                </div>
                   </div>
-         <!-- KONEC DOMOV -->
-         <!-- DODAJ NOV VPIS -->         
+                  <!-- KONEC DOMOV -->
+                  <!-- DODAJ NOV VPIS -->         
                   <div id="dodajNovVpis" class="menu" style="display:none;">
                      <div class="row" >
                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -139,26 +182,22 @@
                            <div class="input-group col-xs-12 col-sm-12">
                               <input id="registracija-ime" type="ime" class="form-control">
                            </div>
-                           <label for="priimek" class="control-label" >Priimek:</label>
+                           <label for="priimek" class="control-label" style="margin-top:10px;">Priimek:</label>
                            <div class="input-group col-xs-12 col-sm-12">
                               <input id="registracija-priimek" type="priimek" class="form-control">
                            </div>
-                           <label  class="control-label">Naslov:</label>
+                           <label  class="control-label" style="margin-top:10px;">Naslov:</label>
                            <div class="input-group col-xs-12 col-sm-12">
                               <input id="registracija-datum" type="Datumrojstva" class="form-control">
                            </div>
-
-                           <label  class="control-label">Skupina:</label>
+                           <label  class="control-label" style="margin-top:10px;">Skupina:</label>
                            <div class="input-group col-xs-12 col-sm-12">
-                             <select>
-                             <option value="null"></option>
-							  <option value="IT">Informatika</option>
-							  <option value="krmila">Krmila</option>
-							</select>
+                              <select>
+                                 <option value="null"></option>
+                                 <option value="IT">Informatika</option>
+                                 <option value="krmila">Krmila</option>
+                              </select>
                            </div>
-                             
-
-
                            <label for="" class="control-label" style="margin-top:40px;">E-mail naslov:</label>
                            <div class="input-group col-xs-12 col-sm-12">
                               <input id="registracija-ura" type="Urarojstva" class="form-control" style="display:inline;">
@@ -166,19 +205,19 @@
                            </div>
                            <table class="table table-hover" style="margin-top:20px;">
                               <thead>
-                              <tr style="background-color:rgba(37, 156, 236, 0.5)">
-                                 <th>E-mail naslov</th>
-                                 <th></th>
-                               </tr>
+                                 <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                    <th>E-mail naslov</th>
+                                    <th></th>
+                                 </tr>
                               </thead>
                               <tbody>
                                  <tr style="border:0;">
                                     <td>enej.ravbar@siol.net</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                                  <tr>
                                     <td>enejcobra@gmail.com</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                               </tbody>
                            </table>
@@ -188,29 +227,29 @@
                            <div class="input-group col-xs-12 col-sm-12">
                               <input  type="text" class="form-control">
                            </div>
-                           <label for="" class="control-label" >Kratka mobilna številka</label>
+                           <label for="" class="control-label" style="margin-top:10px;" >Kratka mobilna številka</label>
                            <div class="input-group col-xs-12 col-sm-12">
                               <input  type="Urarojstva" class="form-control">
                               <button class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
                            </div>
                            <table class="table table-hover" style="margin-top:20px;">
                               <thead>
-                             <tr style="background-color:rgba(37, 156, 236, 0.5)">
-                                 <th>Mobilna št.</th>
-                                 <th>Kratka mob. št.</th>
-                                 <th></th>
-                                </tr>
+                                 <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                    <th>Mobilna št.</th>
+                                    <th>Kratka mob. št.</th>
+                                    <th></th>
+                                 </tr>
                               </thead>
                               <tbody>
                                  <tr style="border:0;">
                                     <td>031 764 700</td>
                                     <td>2000</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                                  <tr style="border:0;">
                                     <td>031 764 700</td>
                                     <td>2000</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                               </tbody>
                            </table>
@@ -220,29 +259,29 @@
                            <div class="input-group col-xs-12 col-sm-12">
                               <input  type="Urarojstva" class="form-control">
                            </div>
-                           <label for="" class="control-label" >Kratka stacionarna številka</label>
+                           <label for="" class="control-label" style="margin-top:10px;">Kratka stacionarna številka</label>
                            <div class="input-group col-xs-12 col-sm-12">
                               <input type="Urarojstva" class="form-control">
                               <button class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
                            </div>
                            <table class="table table-hover" style="margin-top:20px;">
                               <thead>
-                              <tr style="background-color:rgba(37, 156, 236, 0.5)">
-                                 <th>Stacionarna št.</th>
-                                 <th>Kratka stac. št.</th>
-                                 <th></th>
+                                 <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                    <th>Stacionarna št.</th>
+                                    <th>Kratka stac. št.</th>
+                                    <th></th>
                                  </tr>
                               </thead>
                               <tbody>
                                  <tr style="border:0;">
                                     <td>05 7641564</td>
                                     <td>2000</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                                  <tr style="border:0;">
                                     <td>05 7641564</td>
                                     <td>2000</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
+                                    <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
                                  </tr>
                               </tbody>
                            </table>
@@ -257,39 +296,36 @@
                   <!-- KONEC DODAJ NOV VPIS --> 
                   <!-- SKUPINE --> 
                   <div id="skupine" class="menu" style="display:none;">
-                  		<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="margin-top:30px;">
-                  		   <label for="" class="control-label" >Ime skupine</label>
-                           <div class="input-group col-xs-12 col-sm-12">
-                              <input  type="Urarojstva" class="form-control">
-                              <button class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
-                           </div>
-                           
-                           
+                     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="margin-top:30px;">
+                        <label for="" class="control-label" >Ime nove skupine</label>
+                        <div class="input-group col-xs-12 col-sm-12">
+                           <input  type="Urarojstva" class="form-control">
+                           <button class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
                         </div>
-                        <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5" style="margin-top:15px;">
-                        	<table class="table table-hover" style="margin-top:20px;">
-                              <thead>
+                     </div>
+                     <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5" style="margin-top:15px;">
+                        <table class="table table-hover" style="margin-top:20px;">
+                           <thead>
                               <tr style="background-color:rgba(37, 156, 236, 0.5)">
-                                 <th>Ime nove skupine</th>
-                                
+                                 <th>Ime skupine</th>
                                  <th></th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                 <tr style="border:0;">
-                                    <td>Krmila</td>
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
-                                 </tr>
-                                 <tr style="border:0;">
-                                    <td>Informatika</td>
-                                   
-                                    <td><span class="glyphicon glyphicon-trash"></span></td>
-                                 </tr>
-                              </tbody>
-                           </table>
-                        </div>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr style="border:0;">
+                                 <td>Krmila</td>
+                                 <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
+                              </tr>
+                              <tr style="border:0;">
+                                 <td>Informatika</td>
+                                 <td><span class="glyphicon glyphicon-trash" style="float:right;"></span></td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
                   </div>
                   <!-- KONEC SKUPINE-->
+                  
                </div>
             </div>
          </div>
