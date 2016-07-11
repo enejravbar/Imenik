@@ -1,5 +1,7 @@
 $(document).ready(function(){
 	izberiZavihek();
+	skrijIskalnik();
+	oznaciVse();
 });
 
 function izberiZavihek(){
@@ -24,6 +26,11 @@ function izberiZavihek(){
 				$(".menu").css({"display" : "none"});
 				$("#skupine").css({"display" : ""});
 			}
+			if($(this).attr("id")=="povezava-Podrobnosti"){
+				
+				$(".menu").css({"display" : "none"});
+				$("#podrobnosti").css({"display" : ""});
+			}
 			
 				
 		});
@@ -36,4 +43,28 @@ function izberiZavihek(){
 			$("#domov").css({"display" : ""});
 		
 		});
+}
+
+function skrijIskalnik(){
+	
+	$("#skrij-iskalnik").click( function() {
+		
+		$("#iskalnik").fadeToggle();
+
+		if( $("#skrij-iskalnik").attr("class") == "glyphicon glyphicon-chevron-up" ){
+			$("#skrij-iskalnik").attr({
+                "class" : "glyphicon glyphicon-chevron-down"
+            });
+		}else{
+			$("#skrij-iskalnik").attr({
+                "class" : "glyphicon glyphicon-chevron-up"
+            });
+		}
+	});
+}
+
+function oznaciVse(){
+	$("#oznaci-vse").click(function(){
+    $('input:checkbox').not(this).prop('checked', this.checked);
+});
 }
