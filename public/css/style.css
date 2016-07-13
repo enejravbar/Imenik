@@ -37,6 +37,10 @@ a:hover{
 	margin-right:auto;
 }
 
+.glyphicon{
+	cursor: pointer;
+}
+
 ul {
     list-style-type: none;
     margin: 0;
