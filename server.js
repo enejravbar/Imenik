@@ -51,7 +51,7 @@ var pool = mysql.createPool({
 });*/
 
 streznik.get("/", function(zahteva, odgovor) {
-	zahteva.session.uporabnik="/";
+
     if (!zahteva.session.uporabnik) {
 
         odgovor.sendFile(path.join(__dirname, 'public', 'stran-uporabnik.html'));
@@ -63,7 +63,7 @@ streznik.get("/", function(zahteva, odgovor) {
 })
 
 streznik.get("/login", function(zahteva, odgovor) {
-	zahteva.session.uporabnik="/login";
+	
 	if(zahteva.session.uporabnik){
 		odgovor.redirect("/");
 	}else{
@@ -79,6 +79,28 @@ streznik.post("/odjava", function(zahteva, odgovor) {
     }));
 })
 
+streznik.post("/checkLogin", function(zahteva, odgovor) {
+
+    var uporabniskoIme = zahteva.body.username;
+    var geslo = zahteva.body.password;
+
+    //console.log("username "+zahteva.body.username + "\npassword "+zahteva.body.password);
+    var ajaxOdgovor;
+
+    if (uporabniskoIme == "admin" && geslo == adminPassword) {
+        zahteva.session.uporabnik = uporabniskoIme;
+        ajaxOdgovor = {
+            pravilno: true,
+            preusmeritev: "/"
+        }
+    } else {
+        ajaxOdgovor = {
+            pravilno: false,
+            preusmeritev: "/"
+        }
+    }
+    odgovor.json(JSON.stringify(ajaxOdgovor));
+})
 
 streznik.post("/dodajSkupino", function(zahteva, odgovor) {
 
@@ -221,30 +243,137 @@ streznik.post("/seznamDelovnihMest", function(zahteva, odgovor) {
 
 });
 
+streznik.post("/registriraj", function(zahteva, odgovor) {
 
+    pool.getConnection(function(napaka1, connection) {
 
+        if (!napaka1) {
+           
+            var ime = zahteva.body.ime;
+			var priimek = zahteva.body.priimek;
+			var naslov = zahteva.body.naslov;
 
-streznik.post("/checkLogin", function(zahteva, odgovor) {
+			var izbiraSkupine = zahteva.body.izbiraSkupine;		// tabela izbranih skupin
+			var delovnoMesto= zahteva.body.delovnoMesto;		// id delovnega mesta	
 
-    var uporabniskoIme = zahteva.body.username;
-    var geslo = zahteva.body.password;
+			var tabelaEmailov =  zahteva.body.tabelaEmailov;
+			var tabelaMobStevilk =  zahteva.body.tabelaMobStevilk;
+			var tabelaStacStevilk = zahteva.body.tabelaStacStevilk;
+            // vpisi uporabnika
+            console.log('INSERT INTO uporabnik (ime,priimek,naslov,id_del_mesto) VALUES (\''+ime+"\',\'"+priimek+"\',\'"+naslov+"\',\'"+delovnoMesto+'\');');
 
-    //console.log("username "+zahteva.body.username + "\npassword "+zahteva.body.password);
-    var ajaxOdgovor;
+			console.log("ID delovno mesto "+ delovnoMesto);
+			console.log("ID izbire skupin "+ izbiraSkupine);
+			console.log("tabela mailov "+ tabelaEmailov);
+			console.log("tabela mobilnih stevilk "+tabelaMobStevilk);
+			console.log("tabela stacionarnih stevilk "+tabelaStacStevilk);
 
-    if (uporabniskoIme == "admin" && geslo == adminPassword) {
-        zahteva.session.uporabnik = uporabniskoIme;
-        ajaxOdgovor = {
-            pravilno: true,
-            preusmeritev: "/"
+            // vnesi osebo v tabelo uporabnik in pridobi njegov ID 
+            connection.query('INSERT INTO uporabnik (ime,priimek,naslov,id_del_mesto) VALUES (\''+ime+"\',\'"+priimek+"\',\'"+naslov+"\',\'"+delovnoMesto+'\');', function(napaka2, vrstice) {
+                var napakaTabelaUporabnik=0;
+                if (!napaka2) {
+
+                	idOsebe= vrstice.insertId;
+                	//console.log("ID uporabnika je: " + idOsebe); 
+                	napakaTabelaUporabnik=1;
+
+                	var idOsebe;
+
+                	// sledi vnos v OSTALE TABELE -----------------------------------
+
+		            //------- VNOS V TABELO SKUPINE-UPORABNIK ------------
+
+			        for(var i=0;i<izbiraSkupine.length; i++){
+			        	connection.query('INSERT INTO skupine_uporabnik (id_skupina,id_uporabnik) VALUES (\''+izbiraSkupine[i]+"\',\'"+idOsebe+'\');', function(napaka3, vrstice) {
+			        		var napakaTabelaSkupineUporabnik=0;
+			                if (!napaka3) {
+			                	napakaTabelaSkupineUporabnik=1;
+			                   
+			                } else {
+			                	napakaTabelaSkupineUporabnik=0;
+			                	console.log("NAPAKA pri vnosu v tabelo SKUPINE-UPORABNIK \n " +napaka3);
+			                }
+
+			            });
+			        }    
+		            
+			         //------- VNOS V TABELO EMAIL ------------
+		            
+			        for(var i=0;i<tabelaEmailov.length; i++){
+			        	connection.query('INSERT INTO email (id_uporabnik,email) VALUES (\''+idOsebe+"\',\'"+tabelaEmailov[i]+'\');', function(napaka4, vrstice) {
+			                 var napakaTabelaEmail=0;
+			                if (!napaka4) {
+			                	napakaTabelaEmail=1;
+			                   
+			                } else {
+			                	napakaTabelaEmail=0;
+			                	console.log("NAPAKA pri vnosu v tabelo EMAIL \n " +napaka4);
+			                }
+
+			            });
+			        } 
+
+			        //------- VNOS V TABELO MOBILNE_STEVILKE ------------
+
+			       for(var i=0;i<tabelaMobStevilk.length; i++){
+			        	connection.query('INSERT INTO mobilne_stevilke (id_uporabnik,mob_kratka,mob_dolga) VALUES (\''+idOsebe+"\',\'"+tabelaMobStevilk[i].kratkaMobSt+"\',\'"+tabelaMobStevilk[i].mobSt+'\');', function(napaka5, vrstice) {
+			                var napakaTabelaMobilneStevilke=0;
+			                if (!napaka5) {
+			                	napakaTabelaMobilneStevilke=1;
+			                   
+			                } else {
+			                	napakaTabelaMobilneStevilke=0;
+			                }
+
+			            });
+			        }
+
+			        //------- VNOS V TABELO STACIONARNE_STEVILKE ------------
+
+			        for(var i=0;i<tabelaStacStevilk.length; i++){
+			        	connection.query('INSERT INTO stacionarne_stevilke (id_uporabnik,kratka_stac,dolga_stac) VALUES (\''+idOsebe+"\',\'"+tabelaStacStevilk[i].kratkaStacSt+"\',\'"+tabelaStacStevilk[i].stacSt+'\');', function(napaka6, vrstice) {
+			                
+			                var napakaTabelaStacionarneStevilke=0;
+			                if (!napaka6) {
+			                	napakaTabelaStacionarneStevilke=1;
+			                   
+			                } else {
+			                	napakaTabelaStacionarneStevilke=0;
+			                }
+
+			            });
+			        }
+
+			        //console.log(napakaTabelaUporabnik +" "+napakaTabelaSkupineUporabnik +" "+ napakaTabelaMobilneStevilke +" "+ napakaTabelaEmail +" "+ napakaTabelaStacionarneStevilke)
+
+		            /*if(napakaTabelaUporabnik && napakaTabelaSkupineUporabnik && napakaTabelaMobilneStevilke && napakaTabelaEmail && napakaTabelaStacionarneStevilke){
+			        	odgovor.json(JSON.stringify({
+		                	vpisano: true,
+		            	}));
+			        }else{
+			        	odgovor.json(JSON.stringify({
+		                	vpisano: false,
+		                	sporocilo: "NAPAKA! Oseba ni bila uspešno vnešena!"
+		            	}));
+			        } */
+	        
+                } else {
+                	napakaTabelaUporabnik=0;
+
+                }
+
+            });
+ 
+            connection.release();  // sprosti povezavo
+
+        } else {
+            odgovor.json(JSON.stringify({
+                vpisano: false,
+                sporocilo: "NAPAKA! Ni povezave z pod. bazo."
+            }));
         }
-    } else {
-        ajaxOdgovor = {
-            pravilno: false,
-            preusmeritev: "/"
-        }
-    }
-    odgovor.json(JSON.stringify(ajaxOdgovor));
+    });
+
 })
 
 streznik.get("*", function(zahteva, odgovor) {
