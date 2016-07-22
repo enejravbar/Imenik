@@ -18,12 +18,6 @@
             min-width:550px;
          }
       </style>
-      <script>
-         $('#BSbtninfo').filestyle({
-	         buttonName : 'btn-info', 
-	         buttonText : ' Select a File'
-         });
-      </script>
       <link rel="stylesheet" href="css/style.css">
    </head>
    <body >
@@ -124,6 +118,10 @@
                                           <tr>
                                              <th colspan="4" >
                                                 <button id="gumb-iskanje" type="submit" class="btn btn-default btn-md" style="margin-top:10px; margin:auto; display:block;" align="center"> <span class="glyphicon glyphicon-search"></span><span style="margin-left: 3px;">Poišči</span></button> 
+
+                                                <div id="prijava-okvir" class="bg-danger fade-in obvestilo" style="display:none; float:left; margin-left:15px; margin-top:8px;padding:6px; ">
+                                                   
+                                                </div>
                                           </tr>
                                        </tbody>
                                     </table>
@@ -140,10 +138,8 @@
 
                      <div>
 
-	                     <select style="float:right; width:130px; margin-bottom:10px; margin-top:10px;">
+	                     <select id="iskanje-izbiraSkupine" style="float:right; width:130px; margin-bottom:10px; margin-top:10px;">
 		                      <option value="null">Vse skupine</option>
-		                      <option value="IT">Informatika</option>
-		                      <option value="krmila">Krmila</option>
 	                   	</select>
 	                   	
                    	</div>

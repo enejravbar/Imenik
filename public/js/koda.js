@@ -1,5 +1,5 @@
 
-var timer,timer1,timer2,timer3;
+var timer,timer1,timer2,timer3,timer4;
 var tabelaSkupin=[];	
 var tabelaDelovnihMest=[];
 
@@ -16,7 +16,7 @@ $(document).ready(function(){
 	gumbOsveziDelovnaMesta();
 
 	// ----------- DODAJ NOV VPIS -------------
-	prikaziSkupine();
+	prikaziSkupine("registracija-izberiSkupine");
 	dodajanjeEmailov();
 	dodajanjeMobStevilk();
 	dodajanjeStacStevilk();
@@ -25,6 +25,7 @@ $(document).ready(function(){
 	registrirajNovegaZaposlenega();
 
 	//------------ DOMOV ------------------
+	prikaziSkupineDomov("iskanje-izbiraSkupine");
 	isciZaposlene();
 
 });
@@ -42,11 +43,80 @@ function isciZaposlene(){
 		var stacSt=$("#iskanje-stacSt").val();
 		var kratkaStacSt=$("#iskanje-kratkaStacSt").val();
 
+		var izbiraSkupine = pridobiIndekseIzbranih("iskanje-izbiraSkupine");	//tabela izbranih skupin
+		var poz= izbiraSkupine[0];
+		var idSkupine;
+
+		if(poz==0){  // to pomeni, da je bila izbrana možnost "vse skupine"
+			idSkupine=-1;
+			console.log("Izbrana je možnost " + izbiraSkupine);   // vsebuje -1, ki je indikator, da gre za možnost "vse skupine"
+		}else{
+			idSkupine= tabelaSkupin[poz-1].id_skupina;  	// vsebuje id oznacene skupine	
+			console.log("Izbrana je možnost " + poz +" id skupine je "+idSkupine);
+		}
+		
+		var ajaxSporocilo = {
+			ime : ime,
+			priimek : priimek,
+			naslov : naslov,
+			email : email,
+			mobSt : mobSt,
+			kratkaMobSt : kratkaMobSt,
+			stacSt : stacSt,
+			kratkaStacSt : kratkaStacSt
+		}
+
+		$.ajax({
+			    type: "POST",
+			    url: "/isciZaposlene",
+			    dataType: 'json',
+			    contentType: 'application/json', 
+			    async: true,
+			    data: JSON.stringify(ajaxSporocilo),
+
+			    success: function (odgovor){
+		            odgovor=JSON.parse(odgovor);
+			        if(!odgovor.uspeh){
+			            clearTimeout(timer4);
+			            $("#prijava-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+						$("#prijava-okvir").css({
+						"display" : ""
+						});
+						$("#prijava-okvir").text(odgovor.sporocilo);
+
+						timer4 = setTimeout(function() {
+			            $("#prijava-okvir").hide('slow');
+			        	}, 4000);	
+		            }
+
+			    },
+			    error: function (napaka){
+			    	clearTimeout(timer4);
+			    	$("#prijava-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+					$("#prijava-okvir").css({
+					"display" : ""
+					});
+					$("#prijava-okvir").text("NAPAKA! Težava z AJAX zahtevkom.");
+
+					timer4 = setTimeout(function() {
+		            $("#prijava-okvir").hide('slow');
+		        	}, 4000);
+			    }	
+			});
 		//console.log(ime+" " + priimek +" " +naslov+ " " +email+" "+mobSt+" " +kratkaMobSt+" "+stacSt+" "+kratkaStacSt);
 
 
 
 	});
+}
+
+function prikaziSkupineDomov(idSelecta){
+	//console.log("Deluje test test test");
+	tabelaSkupin = pridobiVseSkupine();
+	for(var i=0; i<tabelaSkupin.length; i++){
+		$("#"+idSelecta).append("<option>"+tabelaSkupin[i].ime_skupina+"</option>");
+	}
+	
 }
 
 //----------------------------------  DODAJANJE NOV VPIS -------------------------------
@@ -101,7 +171,7 @@ function registrirajNovegaZaposlenega(){
 
 			    success: function (odgovor){
 		            odgovor=JSON.parse(odgovor);
-			        if(odgovor.uspeh){
+			        if(odgovor.vpisano){
 			            clearTimeout(timer3);
 			            $("#gumb-registriraj-okvir").attr({"class" : "fade-in obvestilo bg-success"});
 						$("#gumb-registriraj-okvir").css({
@@ -299,12 +369,12 @@ function pridobiStacStevilke(idTabeleStacStevilk){
 
 
 
-function prikaziSkupine(){
+function prikaziSkupine(idSelecta){
 	//console.log("Deluje test test test");
-	$("#registracija-izberiSkupine").html("");
+	$("#"+idSelecta).html("");
 	tabelaSkupin = pridobiVseSkupine();
 	for(var i=0; i<tabelaSkupin.length; i++){
-		$("#registracija-izberiSkupine").append("<option>"+tabelaSkupin[i].ime_skupina+"</option>");
+		$("#"+idSelecta).append("<option>"+tabelaSkupin[i].ime_skupina+"</option>");
 	}
 	
 }
@@ -423,7 +493,7 @@ function gumbDodajNovoSkupino(){
 
 		var imeNoveSkupine= $("#imeNoveSkupine").val();
 		dodajNovoSkupino(imeNoveSkupine);
-		prikaziSkupine();
+		prikaziSkupine("registracija-izberiSkupine");
 	});
 }
 
@@ -547,7 +617,7 @@ function izpisiVseSkupine(tabelaSkupin){
 function gumbOsveziSkupine(){
 	$("#gumb-osvezi").click(function(){
 		pridobiVseSkupine();
-		prikaziSkupine();
+		prikaziSkupine("registracija-izberiSkupine");
 	});
 }
 

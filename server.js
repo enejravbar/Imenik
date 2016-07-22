@@ -260,7 +260,7 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 			var tabelaMobStevilk =  zahteva.body.tabelaMobStevilk;
 			var tabelaStacStevilk = zahteva.body.tabelaStacStevilk;
             // vpisi uporabnika
-            console.log('INSERT INTO uporabnik (ime,priimek,naslov,id_del_mesto) VALUES (\''+ime+"\',\'"+priimek+"\',\'"+naslov+"\',\'"+delovnoMesto+'\');');
+            //console.log('INSERT INTO uporabnik (ime,priimek,naslov,id_del_mesto) VALUES (\''+ime+"\',\'"+priimek+"\',\'"+naslov+"\',\'"+delovnoMesto+'\');');
 
 			console.log("ID delovno mesto "+ delovnoMesto);
 			console.log("ID izbire skupin "+ izbiraSkupine);
@@ -290,8 +290,10 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 			                	napakaTabelaSkupineUporabnik=1;
 			                   
 			                } else {
-			                	napakaTabelaSkupineUporabnik=0;
-			                	console.log("NAPAKA pri vnosu v tabelo SKUPINE-UPORABNIK \n " +napaka3);
+			                	odgovor.json(JSON.stringify({
+                                    vpisano: false,
+                                    sporocilo: "NAPAKA! Pri vpisovanju v pod. bazo."
+                                }));
 			                }
 
 			            });
@@ -306,8 +308,10 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 			                	napakaTabelaEmail=1;
 			                   
 			                } else {
-			                	napakaTabelaEmail=0;
-			                	console.log("NAPAKA pri vnosu v tabelo EMAIL \n " +napaka4);
+			                	odgovor.json(JSON.stringify({
+                                    vpisano: false,
+                                    sporocilo: "NAPAKA! Pri vpisovanju v pod. bazo."
+                                }));
 			                }
 
 			            });
@@ -322,7 +326,10 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 			                	napakaTabelaMobilneStevilke=1;
 			                   
 			                } else {
-			                	napakaTabelaMobilneStevilke=0;
+			                	odgovor.json(JSON.stringify({
+                                    vpisano: false,
+                                    sporocilo: "NAPAKA! Pri vpisovanju v pod. bazo."
+                                }));
 			                }
 
 			            });
@@ -338,27 +345,24 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 			                	napakaTabelaStacionarneStevilke=1;
 			                   
 			                } else {
-			                	napakaTabelaStacionarneStevilke=0;
+			                	odgovor.json(JSON.stringify({
+                                    vpisano: false,
+                                    sporocilo: "NAPAKA! Pri vpisovanju v pod. bazo."
+                                }));
 			                }
 
 			            });
 			        }
-
-			        //console.log(napakaTabelaUporabnik +" "+napakaTabelaSkupineUporabnik +" "+ napakaTabelaMobilneStevilke +" "+ napakaTabelaEmail +" "+ napakaTabelaStacionarneStevilke)
-
-		            /*if(napakaTabelaUporabnik && napakaTabelaSkupineUporabnik && napakaTabelaMobilneStevilke && napakaTabelaEmail && napakaTabelaStacionarneStevilke){
-			        	odgovor.json(JSON.stringify({
-		                	vpisano: true,
-		            	}));
-			        }else{
-			        	odgovor.json(JSON.stringify({
-		                	vpisano: false,
-		                	sporocilo: "NAPAKA! Oseba ni bila uspešno vnešena!"
-		            	}));
-			        } */
+                    odgovor.json(JSON.stringify({
+                        vpisano: true,
+                        sporocilo: ""
+                    }));
 	        
                 } else {
-                	napakaTabelaUporabnik=0;
+                	odgovor.json(JSON.stringify({
+                        vpisano: false,
+                        sporocilo: "NAPAKA! Pri vpisovanju v pod. bazo."
+                    }));
 
                 }
 
@@ -376,7 +380,171 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
 
 })
 
+streznik.post("/isciZaposlene", function(zahteva, odgovor) {
+
+    var ime= zahteva.body.ime;
+    var priimek= zahteva.body.priimek;
+    var naslov= zahteva.body.naslov;
+    var email= zahteva.body.email;
+    var mobSt= zahteva.body.mobSt;
+    var kratkaMobSt= zahteva.body.kratkaMobSt;
+    var stacSt= zahteva.body.stacSt;
+    var kratkaStacSt= zahteva.body.kratkaStacSt;
+
+    pool.getConnection(function(napaka1, connection) {
+        if (!napaka1) {
+            connection.query('SELECT u.id_uporabnik, u.ime, u.priimek, u.naslov FROM uporabnik u;', function(napaka2, tabelaUporabnik) {
+                if (!napaka2) {
+                    connection.query('SELECT u.id_uporabnik, e.email FROM uporabnik u, email e WHERE u.id_uporabnik = e.id_uporabnik;', function(napaka3, tabelaEmailov) {
+                        if (!napaka3) {
+                            connection.query('SELECT u.id_uporabnik, m.mob_dolga, m.mob_kratka FROM uporabnik u, mobilne_stevilke m WHERE u.id_uporabnik = m.id_uporabnik;', function(napaka4, tabelaMobStevilke) {
+                                if (!napaka4) {
+                                    
+                                    connection.query('SELECT u.id_uporabnik, stac.dolga_stac, stac.kratka_stac FROM uporabnik u, stacionarne_stevilke stac WHERE u.id_uporabnik = stac.id_uporabnik;', function(napaka5, tabelaStacStevilke) {
+                                        if (!napaka5) {
+                                            connection.query('SELECT u.id_uporabnik, d.ime_del_mesto FROM uporabnik u, delovno_mesto d WHERE u.id_del_mesto = d.id_del_mesto;', function(napaka6, tabelaDelMesto) {
+                                                if (!napaka6) {
+                                                    connection.query('SELECT u.id_uporabnik, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
+                                                        if (!napaka7) {
+                                                            var tabelaZaposlenih = kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine);
+                                                           
+                                                            odgovor.json(JSON.stringify({
+                                                                uspeh: true,
+                                                                podatki: null
+                                                            }));
+                                                        } else {
+                                                            odgovor.json(JSON.stringify({
+                                                                uspeh: false,
+                                                                podatki: null
+                                                            }));
+                                                        }
+                                                    });
+                                                    
+                                                } else {
+                                                    odgovor.json(JSON.stringify({
+                                                        uspeh: false,
+                                                        podatki: null
+                                                    }));
+                                                }
+                                            });
+                                            
+                                        } else {
+                                            odgovor.json(JSON.stringify({
+                                                uspeh: false,
+                                                podatki: null
+                                            }));
+                                        }
+                                    });
+
+                                } else {
+                                    odgovor.json(JSON.stringify({
+                                        uspeh: false,
+                                        podatki: null
+                                    }));
+                                }
+                            });
+
+                        } else {
+                            odgovor.json(JSON.stringify({
+                                uspeh: false,
+                                podatki: null
+                            }));
+                        }
+                    });
+                } else {
+                    odgovor.json(JSON.stringify({
+                        uspeh: false,
+                        podatki: null
+                    }));
+                }
+
+            });
+            connection.release();
+
+        } else {
+            odgovor.json(JSON.stringify({
+                vpisano: false,
+                id: null,
+                sporocilo: "NAPAKA! Ni povezave z pod. bazo."
+            }));
+        }
+    });
+
+});
+
 streznik.get("*", function(zahteva, odgovor) {
     odgovor.redirect("/");
 })
 
+function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine){
+    var tabelaZaposlenih=[];
+    var idZaposlenega;
+    console.log("ID uporabnika je: " +tabelaUporabnik[0].id_uporabnik);
+    for(var i=0; i<tabelaUporabnik.length; i++){
+
+        idZaposlenega = tabelaUporabnik[i].id_uporabnik;
+        console.log("idZaposlenega = " + idZaposlenega);
+        var zaposlenaOseba={
+            id : idZaposlenega,
+            ime : tabelaUporabnik[i].ime,
+            priimek : tabelaUporabnik[i].priimek,
+            naslov : tabelaUporabnik[i].naslov,
+            delMesto : "",
+            email : [],
+            mobStevilke : [],
+            stacStevilke : [],
+            skupine : []
+        }
+
+        for(var j=0; j<tabelaDelMesto.length; j++){
+            if(tabelaDelMesto[j].id_uporabnik == idZaposlenega){
+               zaposlenaOseba.delMesto = tabelaDelMesto[j].ime_del_mesto;
+            }
+        }
+
+        for(var j=0; j<tabelaEmailov.length; j++){
+             //console.log(tabelaEmailov[i].email);
+            if(tabelaEmailov[j].id_uporabnik == idZaposlenega){
+                zaposlenaOseba.email.push(tabelaEmailov[j].email);
+                /*console.log(tabelaEmailov);
+                console.log("id zaposlenega "+ idZaposlenega + " Pridobivam email "+tabelaEmailov[j].email);*/
+            }
+        }
+
+        for(var j=0; j<tabelaMobStevilke.length; j++){
+            if(tabelaMobStevilke[j].id_uporabnik == idZaposlenega){
+                var mobStevilka={
+                    mob_dolga : tabelaMobStevilke[j].mob_dolga,
+                    mob_kratka : tabelaMobStevilke[j].mob_kratka
+                };
+                zaposlenaOseba.mobStevilke.push(mobStevilka);
+            }
+        }
+
+        for(var j=0; j<tabelaStacStevilke.length; j++){
+            if(tabelaStacStevilke[j].id_uporabnik == idZaposlenega){
+                var stacStevilka={
+                    stac_dolga : tabelaStacStevilke[j].dolga_stac,
+                    stac_kratka : tabelaStacStevilke[j].kratka_stac
+                };
+                zaposlenaOseba.stacStevilke.push(stacStevilka);
+            }
+        }
+
+        for(var j=0; j<tabelaSkupine.length; j++){
+            if(tabelaSkupine[j].id_uporabnik == idZaposlenega){
+                zaposlenaOseba.skupine.push(tabelaSkupine[j].ime_skupina);
+                console.log("Pridobivam skupino "+tabelaSkupine[j].ime_skupina);
+            }
+        }
+        tabelaZaposlenih.push(zaposlenaOseba);
+
+    }
+    //console.log("Tabela zaposlenih : "+ tabelaZaposlenih[0].id + " " + tabelaZaposlenih[0].ime + " " +tabelaZaposlenih[0].priimek + " "+tabelaZaposlenih[0].naslov);
+    console.log(tabelaZaposlenih);
+    return tabelaZaposlenih;
+}
+
+function sortirajZaposlene(){
+    
+}
