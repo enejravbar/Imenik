@@ -390,6 +390,9 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
     var kratkaMobSt= zahteva.body.kratkaMobSt;
     var stacSt= zahteva.body.stacSt;
     var kratkaStacSt= zahteva.body.kratkaStacSt;
+    var idSkupine = zahteva.body.idSkupine; 
+
+    console.log("Kratka stacionarna št. = " + kratkaStacSt + " Stac. st = " +stacSt);
 
     pool.getConnection(function(napaka1, connection) {
         if (!napaka1) {
@@ -404,13 +407,13 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
                                         if (!napaka5) {
                                             connection.query('SELECT u.id_uporabnik, d.ime_del_mesto FROM uporabnik u, delovno_mesto d WHERE u.id_del_mesto = d.id_del_mesto;', function(napaka6, tabelaDelMesto) {
                                                 if (!napaka6) {
-                                                    connection.query('SELECT u.id_uporabnik, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
+                                                    connection.query('SELECT u.id_uporabnik, s.id_skupina, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
                                                         if (!napaka7) {
                                                             var tabelaZaposlenih = kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine);
-                                                           
+                                                            var tabelaIskanihZaposlenih = pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, email, mobSt, kratkaMobSt, stacSt, kratkaStacSt, idSkupine);
                                                             odgovor.json(JSON.stringify({
                                                                 uspeh: true,
-                                                                podatki: null
+                                                                podatki: tabelaIskanihZaposlenih
                                                             }));
                                                         } else {
                                                             odgovor.json(JSON.stringify({
@@ -533,18 +536,105 @@ function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevil
 
         for(var j=0; j<tabelaSkupine.length; j++){
             if(tabelaSkupine[j].id_uporabnik == idZaposlenega){
-                zaposlenaOseba.skupine.push(tabelaSkupine[j].ime_skupina);
-                console.log("Pridobivam skupino "+tabelaSkupine[j].ime_skupina);
+                var skupina={
+                    idSkupina : tabelaSkupine[j].id_skupina,
+                    imeSkupina :  tabelaSkupine[j].ime_skupina
+                }
+                zaposlenaOseba.skupine.push(skupina);
+                //console.log("Pridobivam skupino "+tabelaSkupine[j].ime_skupina);
             }
         }
         tabelaZaposlenih.push(zaposlenaOseba);
 
     }
     //console.log("Tabela zaposlenih : "+ tabelaZaposlenih[0].id + " " + tabelaZaposlenih[0].ime + " " +tabelaZaposlenih[0].priimek + " "+tabelaZaposlenih[0].naslov);
-    console.log(tabelaZaposlenih);
+    //console.log(tabelaZaposlenih);
     return tabelaZaposlenih;
 }
 
-function sortirajZaposlene(){
-    
+function pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, email, mobSt, kratkaMobSt, stacSt, kratkaStacSt, idSkupina){
+    var tabelaSortiranihZaposlenih=[];
+
+    for(var i=0; i<tabelaZaposlenih.length; i++){
+
+        //console.log("---Pregledujem--------------- " + tabelaZaposlenih[i].ime + " " + tabelaZaposlenih[i].priimek);
+        if( ( (tabelaZaposlenih[i].ime.toLowerCase()).indexOf(ime.toLowerCase()) > -1  || ime == "") && ((tabelaZaposlenih[i].priimek.toLowerCase()).indexOf(priimek.toLowerCase()) > -1 || priimek == "")  && ( (tabelaZaposlenih[i].naslov.toLowerCase()).indexOf(naslov.toLowerCase()) > -1 || naslov == "") && 
+             preveriLastnistvoEmaila(email, tabelaZaposlenih[i].email) &&  preveriLastnistvoMobStevilke(mobSt, tabelaZaposlenih[i].mobStevilke) && preveriLastnistvoKratkeMobStevilke(kratkaMobSt, tabelaZaposlenih[i].mobStevilke) &&
+             preveriLastnistvoStacStevilke(stacSt, tabelaZaposlenih[i].stacStevilke) && preveriLastnistvoKratkeStacStevilke(kratkaStacSt, tabelaZaposlenih[i].stacStevilke) &&
+             preveriPripadnostSkupini(idSkupina, tabelaZaposlenih[i].skupine)
+             ){
+
+            tabelaSortiranihZaposlenih.push(tabelaZaposlenih[i]);
+        }
+    }
+    console.log(tabelaSortiranihZaposlenih);
+    return tabelaSortiranihZaposlenih;
+}
+
+function preveriLastnistvoEmaila(email, tabelaEmailovOdZaposlenega){
+    for(var i= 0; i<tabelaEmailovOdZaposlenega.length; i++){
+        if((email.toLowerCase()).indexOf(tabelaEmailovOdZaposlenega[i].toLowerCase()) > -1 || email==""){
+            console.log("Email je ustrezen");
+            return true;
+        }
+    }
+    console.log("Email ni ustrezen");
+    return false;
+}
+
+function preveriLastnistvoMobStevilke(mobSt, tabelaMobilnihStevilk){
+    for(var i= 0; i<tabelaMobilnihStevilk.length; i++){
+        if(mobSt == tabelaMobilnihStevilk[i].mob_dolga || mobSt==""){
+            return true;
+            console.log("MobSt je ustrezen");
+        }
+    }
+    console.log("MobSt ni ustrezen");
+    return false;
+}
+
+function preveriLastnistvoKratkeMobStevilke(kratkaMobSt, tabelaMobilnihStevilk){
+    for(var i= 0; i<tabelaMobilnihStevilk.length; i++){
+
+        if(kratkaMobSt == tabelaMobilnihStevilk[i].mob_kratka || kratkaMobSt==""){
+            return true;
+        console.log("kratkaMobSt je ustrezen");
+        }
+    }
+    console.log("kratkaMobSt ni ustrezen");
+    return false;
+}
+
+function preveriLastnistvoStacStevilke(stacSt, tabelaStacStevilk){
+    for(var i= 0; i<tabelaStacStevilk.length; i++){
+        //console.log("primerjam " + stacSt +" in " +tabelaStacStevilk[i].dolga_stac );
+        if(stacSt == tabelaStacStevilk[i].stac_dolga || stacSt==""){
+            return true;
+       console.log("stacSt je ustrezen");
+        }
+    }
+    console.log("stacSt ni ustrezen");
+    return false;
+}
+
+function preveriLastnistvoKratkeStacStevilke(kratkaStacSt, tabelaStacStevilk){
+    for(var i= 0; i<tabelaStacStevilk.length; i++){
+        if(kratkaStacSt == tabelaStacStevilk[i].stac_kratka || kratkaStacSt==""){
+            return true;
+        console.log("kratkaStacSt je ustrezen");
+        }
+    }
+    console.log("kratkaStacSt ni ustrezen");
+    return false;
+}
+
+function preveriPripadnostSkupini(idSkupina, tabelaSkupinZaposlenega){
+    for(var i= 0; i<tabelaSkupinZaposlenega.length; i++){ 
+        if( idSkupina == tabelaSkupinZaposlenega[i].idSkupina || idSkupina == -1 ){  // ce je id skupine enak -1 pomeni vse skupine
+            return true;
+        console.log("Skupina je ustrezen");
+        }
+    }
+    console.log("Skupina ni ustrezen");
+    return false;
 }

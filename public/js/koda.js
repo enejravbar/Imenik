@@ -63,7 +63,8 @@ function isciZaposlene(){
 			mobSt : mobSt,
 			kratkaMobSt : kratkaMobSt,
 			stacSt : stacSt,
-			kratkaStacSt : kratkaStacSt
+			kratkaStacSt : kratkaStacSt,
+			idSkupine: idSkupine
 		}
 
 		$.ajax({
@@ -158,7 +159,7 @@ function registrirajNovegaZaposlenega(){
 				delovnoMesto:delovnoMesto,
 				tabelaEmailov:tabelaEmailov,
 				tabelaMobStevilk:tabelaMobStevilk,
-				tabelaStacStevilk:tabelaStacStevilk
+				tabelaStacStevilk:tabelaStacStevilk,
 			};
 
 			$.ajax({
