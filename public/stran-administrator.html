@@ -130,9 +130,11 @@
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
                            <span style="float:right;">
-                           <button class="btn btn-success btn-sm" >Pošlji E-mail</button>
-                           <button class="btn btn-danger btn-sm" >Izbriši</button>
+                           <a id="poslji-email-povezava"> <button id="poslji-email" class="btn btn-success btn-sm" >Pošlji E-mail</button></a>
+                           <a><button id="izbrisiZaposlenega" class="btn btn-danger btn-sm" >Izbriši</button></a>
                            </span>
+                           <div id="izbrisiZaposlenega-okvir" class="fade-in obvestilo bg-success" style="display:none;padding:6px;"><span ></span></div>
+                           
                         </div>
                      </div>
 
@@ -146,15 +148,15 @@
                     <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                      <div class="" style="display:block; overflow-x:scroll; padding-top:0px; margin-top:0px;">
-                        <table class="table table-hover table-bordered" style="min-width:1300px;  margin-top:0px; margin-bottom:0px;">
+                        <table class="table table-hover table-bordered" style="min-width:1300px; margin-top:0px; margin-bottom:0px;">
                         <thead>
                            <tr style="background-color:rgba(37, 156, 236, 0.5)">
                               <th></th>
                               <th>Ime <span id="urediPoImenu" class="glyphicon glyphicon-sort-by-attributes" style="float:right;margin-top:3px;"></span></th>
                               <th>Priimek <span id="urediPoPriimku" class="glyphicon glyphicon-sort-by-attributes" style="float:right;margin-top:3px;"></span></th>
                               <th>Naslov <span id="urediPoNaslovu" class="glyphicon glyphicon-sort-by-attributes" style="float:right;margin-top:3px;"></span></th>
-                              <th>Skupina <span id="urediPoSkupini" class="glyphicon glyphicon-sort-by-attributes" style="float:right;margin-top:3px;"></span></th>
-                              <th>Del. mesto</th>
+                              <th>Skupina </span></th>
+                              <th>Del. mesto <span id="urediPoDelovnemMestu" class="glyphicon glyphicon-sort-by-attributes" style="float:right;margin-top:3px;"></th>
                               <th>E-mail naslovi</th>
                               <th>Mob. št.</th>
                               <th>Kratka mob. št.</th>
@@ -163,27 +165,8 @@
                               <th></th>
                            </tr>
                         </thead>
-                        <tbody>
-                           <tr>
-                              <td><input type="checkbox"></td>
-                              <td>Matevž</td>
-                              <td>Železnik</td>
-                              <td>Pivka</td>
-                              <td>IT</td>
-                              <td>Informatika</td>
-                              <td>matevz.zeleznik@pivkap.si</td>
-                              <td>
-                                 <span style="display:block;">051 684 319<span>
-                                 <span style="display:block;">041 635 234<span>
-                              </td>
-                              <td>2000</td>
-                              <td>05 7031000</td>
-                              <td>2000</td>
-                              <td>
-                                 <button style="margin-top:5px;" class="btn btn-primary btn-sm">Uredi</button>
-                                 <button style="margin-top:5px;" class="btn btn-primary btn-sm">Podrobnosti</button>
-                              </td>
-                           </tr>
+                        <tbody id="podatkiOZaposlenih">
+                        
                            
                         </tbody>
                      </table>
@@ -199,10 +182,9 @@
 		                     <div style="margin-top:20px;">
 		                        <span>
 		                           Dodaj izbrane v skupino
-		                           <select >
+		                           <select id="dodajIzbraneVSkupino">
 		                              <option value="null"></option>
-		                              <option value="IT">Informatika</option>
-		                              <option value="krmila">Krmila</option>
+		                              
 		                           </select>
 		                        </span>
 		                        <button class="btn btn-success btn-sm" style="margin-left:8px;">Dodaj</button>
@@ -210,10 +192,9 @@
 		                     <div style="margin-top:10px;">
 		                        <span>
 		                           Odstrani izbrane iz skupine
-		                           <select>
+		                           <select id="odstraniIzbraneIzSkupine">
 		                              <option value="null"></option>
-		                              <option value="IT">Informatika</option>
-		                              <option value="krmila">Krmila</option>
+		                              
 		                           </select>
 		                        </span>
 		                        <button class="btn btn-danger btn-sm" style="margin-left:8px;">Odstrani</button>
@@ -224,12 +205,12 @@
 			                  <table class="table table-hover" style="margin-top:20px;">
 			                        <tbody>
 			                           <tr style="border:0;">
-			                              <td><span>Izvozi CSV datoteko z izbranimi zaposlenimi </span></td>
-			                              <td><button class="btn btn-sm btn-primary">Izvozi</button></td>
+			                              <td ><span>Izvozi CSV datoteko z izbranimi zaposlenimi </span></td>
+			                              <td ><a id="izvoziCSVIzbranih-povezava"><button id="izvoziCSVIzbranih" class="btn btn-sm btn-primary">Izvozi</button></a></td>
 			                           </tr>
 			                           <tr style="border:0;">
 			                              <td><span>Izvozi CSV datoteko vseh zaposlenih </span></td>
-			                              <td><button class="btn btn-sm btn-primary">Izvozi</button></td>
+			                              <td><a id="izvoziCSVVseh-povezava"><button id="izvoziCSVVseh" class="btn btn-sm btn-primary">Izvozi</button></td>
 			                           </tr>
 			                        </tbody>
 			                     </table>

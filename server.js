@@ -410,6 +410,7 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
                                                     connection.query('SELECT u.id_uporabnik, s.id_skupina, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
                                                         if (!napaka7) {
                                                             var tabelaZaposlenih = kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine);
+                                                            console.log("Tabela zaposlenih: " +tabelaZaposlenih);
                                                             var tabelaIskanihZaposlenih = pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, email, mobSt, kratkaMobSt, stacSt, kratkaStacSt, idSkupine);
                                                             odgovor.json(JSON.stringify({
                                                                 uspeh: true,
@@ -475,6 +476,42 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
 
 });
 
+streznik.post("/izbrisiZaposlenega", function(zahteva,odgovor){
+
+    var idUporabnika = zahteva.body.idUporabnika;
+    console.log("idUporabnika = " + idUporabnika);
+    pool.getConnection(function(napaka1, connection) {
+        if (!napaka1) {
+
+                connection.query('DELETE FROM uporabnik WHERE id_uporabnik=\"'+idUporabnika+'\";', function(napaka2, vrstice) {
+                    if (!napaka2) {
+                        odgovor.json(JSON.stringify({
+                            uspeh: true,
+                            sporocilo:"Zaposleni je bil uspešno izbrisan!"
+                        }));
+                    } else {
+                        odgovor.json(JSON.stringify({
+                            uspeh: false,
+                            sporocilo: "NAPAKA! Zaposleni ni bil izbrisan!"
+                        }));
+                        console.log(napaka2);
+                        return;
+                    }
+
+                });
+            
+            connection.release();
+
+        } else {
+            odgovor.json(JSON.stringify({
+                uspeh: false,
+                id: null,
+                sporocilo: "NAPAKA! Ni povezave z pod. bazo."
+            }));
+        }
+    });
+})
+
 streznik.get("*", function(zahteva, odgovor) {
     odgovor.redirect("/");
 })
@@ -482,7 +519,7 @@ streznik.get("*", function(zahteva, odgovor) {
 function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine){
     var tabelaZaposlenih=[];
     var idZaposlenega;
-    console.log("ID uporabnika je: " +tabelaUporabnik[0].id_uporabnik);
+    //console.log("ID uporabnika je: " +tabelaUporabnik[0].id_uporabnik);
     for(var i=0; i<tabelaUporabnik.length; i++){
 
         idZaposlenega = tabelaUporabnik[i].id_uporabnik;
@@ -572,6 +609,7 @@ function pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, 
 }
 
 function preveriLastnistvoEmaila(email, tabelaEmailovOdZaposlenega){
+    if(tabelaEmailovOdZaposlenega.length==0){return true;}
     for(var i= 0; i<tabelaEmailovOdZaposlenega.length; i++){
         if((email.toLowerCase()).indexOf(tabelaEmailovOdZaposlenega[i].toLowerCase()) > -1 || email==""){
             console.log("Email je ustrezen");
@@ -583,6 +621,7 @@ function preveriLastnistvoEmaila(email, tabelaEmailovOdZaposlenega){
 }
 
 function preveriLastnistvoMobStevilke(mobSt, tabelaMobilnihStevilk){
+    if(tabelaMobilnihStevilk.length==0){return true;}
     for(var i= 0; i<tabelaMobilnihStevilk.length; i++){
         if(mobSt == tabelaMobilnihStevilk[i].mob_dolga || mobSt==""){
             return true;
@@ -594,6 +633,7 @@ function preveriLastnistvoMobStevilke(mobSt, tabelaMobilnihStevilk){
 }
 
 function preveriLastnistvoKratkeMobStevilke(kratkaMobSt, tabelaMobilnihStevilk){
+    if(tabelaMobilnihStevilk.length==0){return true;}
     for(var i= 0; i<tabelaMobilnihStevilk.length; i++){
 
         if(kratkaMobSt == tabelaMobilnihStevilk[i].mob_kratka || kratkaMobSt==""){
@@ -606,6 +646,7 @@ function preveriLastnistvoKratkeMobStevilke(kratkaMobSt, tabelaMobilnihStevilk){
 }
 
 function preveriLastnistvoStacStevilke(stacSt, tabelaStacStevilk){
+    if(tabelaStacStevilk.length==0){return true;}
     for(var i= 0; i<tabelaStacStevilk.length; i++){
         //console.log("primerjam " + stacSt +" in " +tabelaStacStevilk[i].dolga_stac );
         if(stacSt == tabelaStacStevilk[i].stac_dolga || stacSt==""){
@@ -618,6 +659,7 @@ function preveriLastnistvoStacStevilke(stacSt, tabelaStacStevilk){
 }
 
 function preveriLastnistvoKratkeStacStevilke(kratkaStacSt, tabelaStacStevilk){
+    if(tabelaStacStevilk.length==0){return true;}
     for(var i= 0; i<tabelaStacStevilk.length; i++){
         if(kratkaStacSt == tabelaStacStevilk[i].stac_kratka || kratkaStacSt==""){
             return true;
