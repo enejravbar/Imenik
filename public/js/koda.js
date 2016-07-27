@@ -16,6 +16,9 @@ $(document).ready(function(){
 	gumbDodajNovoDelovnoMesto();
 	pridobiVsaDelovnaMesta();
 	gumbOsveziDelovnaMesta();
+
+	gumb_izbrisiSkupino();
+	gumb_izbrisiDelovnoMesto();
 	/*sortirajPoImenuDelovnegaMesta();
 	sortirajPoImenuSkupine();*/   // pri sortiranju lahko pride do problemov, ker več funkcij uporablja isto tabelo
 
@@ -34,11 +37,12 @@ $(document).ready(function(){
 	sortirajTabeloZaposlenih();
 	//testSort();
 	gumb_izvoziCSVZIzbranimiZaposlenimi();
-	gumb_izvoziCSVZVsemiZaposlenimi();
+	//gumb_izvoziCSVZVsemiZaposlenimi();
 	gumb_posljiEmail();
 	gumb_izbrisiZaposlenega();
 	gumb_dodajZaposlenegaVSkupino();
 	gumb_odstraniZaposlenegaIzSkupine();
+	naloziCSVDatoteko();
 });
 
 //---------------------------------- DOMOV -------------------------------------
@@ -343,7 +347,6 @@ function prikaziIskaneZaposlene(tabelaZaposlenih){
              }
              html+= "<td>" +
                     "   <button style=\"margin-top:5px;\" class=\"btn btn-primary btn-sm\">Uredi</button>" + 
-                    "   <button style=\"margin-top:5px;\" class=\"btn btn-primary btn-sm\">Podrobnosti</button>" +
                     "</td>" + 
                     "</tr>";
 
@@ -537,6 +540,136 @@ function kreirajSeznamMailovZaPosiljanje(){
     return seznamMailov;
 }
 
+function naloziCSVDatoteko(){
+	$("#uvoziCSV").click(function() {
+            $.FileDialog({multiple: false}).on('files.bs.filedialog', function(ev) {
+                var files = ev.files;
+                //console.log(files);
+                var text = "";
+                preberiCSV(files[0]);
+                /*files.forEach(function(f) {
+                    text += f.content + "<br/>";
+                });*/
+                
+                
+	            }).on('cancel.bs.filedialog', function(ev) {
+	            });
+	});
+}
+
+ function preberiCSV(csvDatoteka) {
+  var reader = new FileReader();
+  // Read file into memory as UTF-8      
+  reader.readAsText(csvDatoteka);
+  // Handle errors load
+  reader.onload = loadHandler;
+  //reader.onerror = errorHandler;
+}
+
+function loadHandler(event) {
+  var csv = event.target.result;
+  obdelajCSVTextInUvozi(csv);
+  //$("#cointainer-telo").html(csv);
+}
+
+
+function obdelajCSVTextInUvozi(csvText){
+	var tabela = csvText.split(/,|\n/);
+	var tabelaZaposleniZaUvoziti=[];
+	
+	var stevec=0;
+	
+	//console.log("TABELA-------------\n\n"+tabela);
+	//console.log("VREDNOST tabele na 7 " + tabela[7]);
+	for(var i=0; i< tabela.length; i++){
+		
+		//console.log("tabela na " + i+".mesto ima vrednost\'"+tabela[i]+"\'");
+		if(i>= 7){
+
+			if(stevec==0){
+				var zaposleniZaUvoziti = {
+					ime:"",
+					priimek:"",
+					tabelaEmailov:[],
+					tabelaMobStevilk:[],
+					tabelaStacStevilk:[],
+				}
+				zaposleniZaUvoziti.priimek=tabela[i];
+				//console.log("Priimek je "+ tabela[i]);
+			}
+			if(stevec==1){
+				zaposleniZaUvoziti.ime=tabela[i];
+				//console.log("Ime je "+ tabela[i]);
+			}
+			if(stevec==2){
+				zaposleniZaUvoziti.tabelaEmailov[0]=tabela[i];
+				//console.log("Email je "+ tabela[i]);
+			}
+			if(stevec==3){
+				var objMobSt;
+				objMobSt={
+					mobSt:tabela[i],
+					kratkaMobSt:""
+				}	
+			}
+			if(stevec==4){
+				objMobSt.kratkaMobSt=tabela[i];
+				zaposleniZaUvoziti.tabelaMobStevilk.push(objMobSt);
+			}
+			if(stevec==5){
+				var objStacSt;
+				objStacSt={
+					stacSt:tabela[i],
+					kratkaStacSt:""
+				}
+				
+			}
+			if(stevec==6){
+				objStacSt.kratkaStacSt=tabela[i];
+				zaposleniZaUvoziti.tabelaStacStevilk.push(objStacSt);
+
+				tabelaZaposleniZaUvoziti.push(zaposleniZaUvoziti);
+				console.log(zaposleniZaUvoziti);
+				stevec=-1;
+			}
+			stevec++;
+		}
+	}
+	console.log(tabelaZaposleniZaUvoziti); 
+
+	for(var i=0; i<tabelaZaposleniZaUvoziti.length; i++){
+
+		var ajaxSporocilo={
+					ime:tabelaZaposleniZaUvoziti[i].ime,
+					priimek:tabelaZaposleniZaUvoziti[i].priimek,
+					naslov:"",
+					izbiraSkupine:[], 
+					delovnoMesto:null,
+					tabelaEmailov:tabelaZaposleniZaUvoziti[i].tabelaEmailov,
+					tabelaMobStevilk:tabelaZaposleniZaUvoziti[i].tabelaMobStevilk,
+					tabelaStacStevilk:tabelaZaposleniZaUvoziti[i].tabelaStacStevilk,
+				};
+
+				$.ajax({
+				    type: "POST",
+				    url: "/registriraj",
+				    dataType: 'json',
+				    contentType: 'application/json', 
+				    async: true,
+				    data: JSON.stringify(ajaxSporocilo),
+
+				    success: function (odgovor){
+			            odgovor=JSON.parse(odgovor);
+				       
+				    },
+				    error: function (napaka){
+				    	
+				    }	
+				});
+	}
+
+}
+
 function gumb_izvoziCSVZIzbranimiZaposlenimi(){
 	$("#izvoziCSVIzbranih").click(function(){
 		var tabelaIndeksov=[];
@@ -559,9 +692,9 @@ function gumb_izvoziCSVZIzbranimiZaposlenimi(){
 		});	
 }
 
-function gumb_izvoziCSVZVsemiZaposlenimi(){
+/*function gumb_izvoziCSVZVsemiZaposlenimi(){
 	$("#izvoziCSVVseh").click(function(){
-
+		console.log("Zaznan klik na gumb izvozi CSV.");
 	    var csvText=kreirajCSVDokument(tabelaIskanihZaposlenih);
 	    
 	    var filename = 'izvoz.csv';
@@ -576,19 +709,19 @@ function gumb_izvoziCSVZVsemiZaposlenimi(){
 
 	    $("#izvoziCSVVseh-povezava").click();
 		});	
-}
+}*/
 
 function kreirajCSVDokument(tabelaIndeksov){
-	var csv ='"Ime","Priimek","Naslov","Skupina","Del. mesto","E-mail naslovi","Mob. št.","Kratka mob. št.","Stac. št.","Kratka stac. št."\n';
+	var csv ='Ime,Priimek,Naslov,Skupina,Del. mesto,E-mail naslovi,Mob. št.,Kratka mob. št.,Stac. št.,Kratka stac. št.\n';
 	var poz;
 	for(var i=0; i<tabelaIndeksov.length; i++){
 
 		poz= tabelaIndeksov[i];
-		csv+= "\""+tabelaIskanihZaposlenih[poz].ime+"\",";
-		csv+= "\""+tabelaIskanihZaposlenih[poz].priimek+"\",";
-		csv+= "\""+tabelaIskanihZaposlenih[poz].naslov+"\",";
+		csv+= tabelaIskanihZaposlenih[poz].ime+",";
+		csv+= tabelaIskanihZaposlenih[poz].priimek+",";
+		csv+= tabelaIskanihZaposlenih[poz].naslov+",";
 		
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].skupine.length;j++){
 			if(tabelaIskanihZaposlenih[poz].skupine.length-1==j){
 				csv+= tabelaIskanihZaposlenih[poz].skupine[j].imeSkupina;
@@ -596,11 +729,11 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+= tabelaIskanihZaposlenih[poz].skupine[j].imeSkupina+" ";
 		}
-		csv+="\",";
+		csv+=",";
 
-		csv+= "\""+tabelaIskanihZaposlenih[poz].delMesto+"\",";
+		csv+= ""+tabelaIskanihZaposlenih[poz].delMesto+",";
 
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].email.length; j++){
 			if(tabelaIskanihZaposlenih[poz].email.length-1==j){
 				csv+= tabelaIskanihZaposlenih[poz].email[j];
@@ -608,9 +741,9 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+= tabelaIskanihZaposlenih[poz].email[j] +" ";
 		}
-		csv+="\",";
+		csv+=",";
 
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].mobStevilke.length; j++){
 			if(tabelaIskanihZaposlenih[poz].mobStevilke.length-1==j){
 				csv+= tabelaIskanihZaposlenih[poz].mobStevilke[j].mob_dolga;
@@ -618,9 +751,9 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+= tabelaIskanihZaposlenih[poz].mobStevilke[j].mob_dolga+" ";
 		}
-		csv+="\",";
+		csv+=",";
 
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].mobStevilke.length; j++){
 
 			if(tabelaIskanihZaposlenih[poz].mobStevilke.length-1==j){
@@ -629,9 +762,9 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+=tabelaIskanihZaposlenih[poz].mobStevilke[j].mob_kratka+" ";
 		}
-		csv+="\",";
+		csv+=",";
 		
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].stacStevilke.length; j++){
 			if(tabelaIskanihZaposlenih[poz].stacStevilke.length-1==j){
 				csv+=tabelaIskanihZaposlenih[poz].stacStevilke[j].stac_dolga;
@@ -639,9 +772,9 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+=tabelaIskanihZaposlenih[poz].stacStevilke[j].stac_dolga+" ";
 		}
-		csv+="\",";
+		csv+=",";
 
-		csv+="\"";
+		csv+="";
 		for(var j=0; j<tabelaIskanihZaposlenih[poz].stacStevilke.length; j++){
 			if(tabelaIskanihZaposlenih[poz].stacStevilke.length-1==j){
 				csv+=tabelaIskanihZaposlenih[poz].stacStevilke[j].stac_kratka;
@@ -649,7 +782,7 @@ function kreirajCSVDokument(tabelaIndeksov){
 			}
 			csv+= tabelaIskanihZaposlenih[poz].stacStevilke[j].stac_kratka+" ";
 		}
-		csv+="\"\n";
+		csv+="\n";
 
 	}
 	console.log(csv);
@@ -1192,6 +1325,49 @@ function gumbOsveziSkupine(){
 	});
 }
 
+function gumb_izbrisiSkupino(){
+	/*$(".glyphicon-trash").click(function(){
+		console.log("Zaznan je bil klik na smetnjak");
+		$(this).css({"display" : "none"});
+	});*/
+
+
+	$(document).on('click', '#seznam-skupin .glyphicon-trash', function () {
+	   	
+		var indeks = $(this).parent().parent().index();
+		izbrisiSkupino(tabelaSkupin[indeks].id_skupina);
+		console.log(tabelaSkupin);
+	});
+
+
+}
+
+function izbrisiSkupino(idSkupine){
+
+	var ajaxZahtevek={
+		idSkupine : idSkupine
+	}
+
+	$.ajax({
+		    type: "POST",
+		    url: "/izbrisiSkupino",
+		    dataType: 'json',
+		    contentType: 'application/json', 
+		    async: true,
+		    data: JSON.stringify(ajaxZahtevek),
+
+		    success: function (odgovor){
+	                odgovor=JSON.parse(odgovor);
+	                if(odgovor.uspeh){
+	                	$("#gumb-osvezi").click();	
+	                	prikaziSkupine("registracija-izberiSkupine");
+	                	prikaziSkupineDomov();
+	                }
+	                
+		    }
+		});
+}
+
 //----------------------------------  DODAJANJE DELOVNEGA MESTA -------------------------------
 
 function gumbDodajNovoDelovnoMesto(){
@@ -1274,6 +1450,44 @@ function gumbOsveziDelovnaMesta(){
 		pridobiVsaDelovnaMesta();
 		prikaziDelovnaMesta();
 	});
+}
+
+
+function gumb_izbrisiDelovnoMesto(){
+
+	$(document).on('click', '#seznamDelovnihMest .glyphicon-trash', function () {
+	   	
+		var indeks = $(this).parent().parent().index();
+		izbrisiDelovnoMesto(tabelaDelovnihMest[indeks].id_del_mesto);
+		console.log(tabelaDelovnihMest);
+	});
+
+
+}
+
+function izbrisiDelovnoMesto(idDelMesto){
+
+	var ajaxZahtevek={
+		idDelMesto : idDelMesto
+	}
+
+	$.ajax({
+		    type: "POST",
+		    url: "/izbrisiDelovnoMesto",
+		    dataType: 'json',
+		    contentType: 'application/json', 
+		    async: true,
+		    data: JSON.stringify(ajaxZahtevek),
+
+		    success: function (odgovor){
+	                odgovor=JSON.parse(odgovor);
+	                if(odgovor.uspeh){
+	                	$("#gumb-osvezi-del-mesta").click();	
+	                	prikaziDelovnaMesta();
+	                }
+	                
+		    }
+		});
 }
 
 function izpisiVsaDelovnaMesta(tabelaDelovnihMest){
