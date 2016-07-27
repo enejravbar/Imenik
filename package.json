@@ -2,16 +2,17 @@
   "name": "Pregled-meritev",
   "author": "Enej Ravbar",
   "dependencies": {
+    "body-parser": "latest",
+    "bootstrap-confirm-delete": "^2.1.2",
+    "crypto": "latest",
     "express": "latest",
-    "express-session":"latest",
+    "express-session": "latest",
     "formidable": "latest",
-    "util": "latest",
-    "fs":"latest",
-    "http":"latest",
-    "https":"latest",
-    "body-parser":"latest",
-    "crypto" : "latest",
-    "nodemon" : "latest",
-    "mysql": "latest"
+    "fs": "latest",
+    "http": "latest",
+    "https": "latest",
+    "mysql": "latest",
+    "nodemon": "latest",
+    "util": "latest"
   }
 }

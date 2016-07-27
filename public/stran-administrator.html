@@ -6,8 +6,11 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="knjiznice/bootstrap-v3.3.6/css/bootstrap.css">
       <link rel="stylesheet" href="knjiznice/bootstrap-v3.3.6/css/bootstrap-theme.css">
+      <link rel="stylesheet" href="knjiznice/bootstrap-v3.3.6/css/bootstrap-confirm-delete.css">
+
       <script src="knjiznice/jQuery-v2.1.4/jQuery-v2.1.4.js"></script>
       <script src="knjiznice/bootstrap-v3.3.6/js/bootstrap.js"></script>
+      <script src="knjiznice/bootstrap-v3.3.6/js/bootstrap-confirm-delete.js"></script>
       <script src="js/koda.js"></script>
       <script src="js/administrator.js"></script>
 
@@ -25,7 +28,7 @@
          <div id="glava" class="row" style="position:fixed; left:15px; z-index:5;width:100%; height:75px;">
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                <a ><span id="glava-naslov" class="kategorija1" style="margin-top:15px;"><b>Imenik zaposlenih</b></span></a>
-               <a ><span id="gumb-odjava" class="menu-povezava" style="position:fixed; right:30px; top:8px;"> <span class="glyphicon glyphicon-log-out" style="font-size:17px;margin-right:6px; "></span>Odjava</span></a>
+               <a ><span id="gumb-odjava" class="menu-povezava" style="position:fixed; right:30px; top:8px;"> <span class="glyphicon glyphicon-log-out" style="font-size:17px;margin-right:6px;"></span>Odjava</span></a>
             </div>
          </div>
       </div>
@@ -50,13 +53,16 @@
                          
                     
                            <table class="table table-bordered table-hover" align="center" style="background-color: rgba(157, 157, 157,0.05); margin-bottom:0px; ">
-                                       <tbody>
-                                          <tr style="background-color: rgba(37, 156, 236,0.5);">
-                                             <th colspan="4" style="text-align:center; "><span>Napredni iskalnik</span>
-                                             	<span class="glyphicon glyphicon-chevron-down" style="float:right; margin-top:3px;"></span>
-                                             </th>
+                                    <thead>
+                                       <tr style="background-color: rgba(37, 156, 236,0.5);">
+                                                      <th colspan="4" style="text-align:center; "><span>Napredni iskalnik</span>
+                                                         <span id="skrij-iskalnik" class="glyphicon glyphicon-chevron-down" style="float:right; margin-top:3px;"></span>
+                                                      </th>
 
-                                          </tr>
+                                                   </tr>
+                                    </thead>
+                                       <tbody  id="iskalnik">
+                                          
                                          
                                           <tr>
                                              <td>Ime:</td>
@@ -133,7 +139,7 @@
                            <a id="poslji-email-povezava"> <button id="poslji-email" class="btn btn-success btn-sm" >Pošlji E-mail</button></a>
                            <a><button id="izbrisiZaposlenega" class="btn btn-danger btn-sm" >Izbriši</button></a>
                            </span>
-                           <div id="izbrisiZaposlenega-okvir" class="fade-in obvestilo bg-success" style="display:none;padding:6px;"><span ></span></div>
+                           <div id="izbrisiZaposlenega-okvir" class="fade-in obvestilo bg-success" style="display:none;padding:6px;margin-top:40px;"><span ></span></div>
                            
                         </div>
                      </div>
@@ -187,7 +193,7 @@
 		                              
 		                           </select>
 		                        </span>
-		                        <button class="btn btn-success btn-sm" style="margin-left:8px;">Dodaj</button>
+		                        <button id="dodajZaposlenegaVSkupino" class="btn btn-success btn-sm" style="margin-left:8px;">Dodaj</button>
 		                     </div>
 		                     <div style="margin-top:10px;">
 		                        <span>
@@ -197,7 +203,7 @@
 		                              
 		                           </select>
 		                        </span>
-		                        <button class="btn btn-danger btn-sm" style="margin-left:8px;">Odstrani</button>
+		                        <button id="odstraniZaposlenegaIzSkupine" class="btn btn-danger btn-sm" style="margin-left:8px;">Odstrani</button>
 		                     </div>
 		                    
 		                  </div>
@@ -340,7 +346,7 @@
                            <table style="margin-bottom:0px; padding-bottom:0px; margin-top:30px;" class="table table-hover">
                               <thead  style="background-color: rgba(37, 156, 236,0.5);">
                                  <tr>
-                                    <th>Ime skupine<span class="glyphicon glyphicon-sort-by-attributes" style="margin-left:10px;"></span>
+                                    <th>Ime skupine
                                        <button id="gumb-osvezi" type="submit" class="btn btn-success btn-sm" style="float:right; display:block;"> <span class="glyphicon glyphicon-refresh" style=""></span> 
                                        <span style="margin-left:5px;">Osveži</span>
                               </button>
@@ -374,7 +380,7 @@
                            <table style="margin-bottom:0px; padding-bottom:0px; margin-top:30px;" class="table table-hover">
                               <thead  style="background-color: rgba(37, 156, 236,0.5);">
                                  <tr>
-                                    <th>Ime delovnega mesta<span class="glyphicon glyphicon-sort-by-attributes" style="margin-left:10px;"></span>
+                                    <th>Ime delovnega mesta
                                        <button id="gumb-osvezi-del-mesta" type="submit" class="btn btn-success btn-sm" style="float:right; display:block;"> <span class="glyphicon glyphicon-refresh" style=""></span> 
                                        <span style="margin-left:5px;">Osveži</span>
                                     </th>

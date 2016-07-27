@@ -16,6 +16,8 @@ $(document).ready(function(){
 	gumbDodajNovoDelovnoMesto();
 	pridobiVsaDelovnaMesta();
 	gumbOsveziDelovnaMesta();
+	/*sortirajPoImenuDelovnegaMesta();
+	sortirajPoImenuSkupine();*/   // pri sortiranju lahko pride do problemov, ker več funkcij uporablja isto tabelo
 
 	// ----------- DODAJ NOV VPIS -------------
 	prikaziSkupine("registracija-izberiSkupine");
@@ -35,6 +37,8 @@ $(document).ready(function(){
 	gumb_izvoziCSVZVsemiZaposlenimi();
 	gumb_posljiEmail();
 	gumb_izbrisiZaposlenega();
+	gumb_dodajZaposlenegaVSkupino();
+	gumb_odstraniZaposlenegaIzSkupine();
 });
 
 //---------------------------------- DOMOV -------------------------------------
@@ -120,6 +124,142 @@ function isciZaposlene(){
 			});
 		//console.log(ime+" " + priimek +" " +naslov+ " " +email+" "+mobSt+" " +kratkaMobSt+" "+stacSt+" "+kratkaStacSt);
 	});
+}
+
+function gumb_dodajZaposlenegaVSkupino(){
+	$("#dodajZaposlenegaVSkupino").click(function(){
+		var indeks;
+		$("#dodajIzbraneVSkupino").find("option").each(function(){
+			if(this.selected){
+				indeks=$(this).index()-1;
+				console.log("IndeksGumba je "+indeks);
+			}
+			
+		});
+
+		if(indeks!=-1){
+			var objektSkupine = tabelaSkupin[indeks];
+			console.log(objektSkupine);
+			var tabelaPozicij=[];
+		    $('#podatkiOZaposlenih input:checked').each(function(){
+			       		tabelaPozicij.push($(this).parent().parent().index());
+			});
+			var tabelaIzbranihZaposlenih=[];
+			for(var i=0; i<tabelaPozicij.length; i++){
+				tabelaIzbranihZaposlenih.push( tabelaIskanihZaposlenih[tabelaPozicij[i]]);
+			}
+
+			
+				for(var i=0; i<tabelaIzbranihZaposlenih.length; i++){
+					console.log(tabelaIzbranihZaposlenih[i]);
+					dodajZaposlenegaVSkupino(tabelaIzbranihZaposlenih[i],objektSkupine);
+				}
+		}
+		
+	});
+}
+
+function dodajZaposlenegaVSkupino(objektZaposlenega,objektSkupina){
+
+	var zaposleni=objektZaposlenega;
+	for(var i=0; i<zaposleni.skupine.length;i++){
+		if(zaposleni.skupine[i].idSkupina==objektSkupina.id_skupina){
+			console.log("Oseba je že vsebovana v skupini!");
+			return;
+		}
+	}
+	// če oseba še ni v teji skupini jo dodamo
+
+	$.ajax({
+	    type: "POST",
+	    url: "/dodajVSkupino",
+	    dataType: 'json',
+	    contentType: 'application/json', 
+	    async: true,
+	    data: JSON.stringify({ idZaposlenega: objektZaposlenega.id, idSkupine:objektSkupina.id_skupina}),
+
+	    success: function (odgovor){
+            odgovor=JSON.parse(odgovor);
+	        if(odgovor.uspeh){
+	            $("#gumb-iskanje").click();
+            }else{
+            	
+            }
+	    },
+	    error: function (napaka){
+	    	
+	    }	
+	});
+}
+function gumb_odstraniZaposlenegaIzSkupine(){
+	$("#odstraniZaposlenegaIzSkupine").click(function(){
+		var indeks;
+		$("#odstraniIzbraneIzSkupine").find("option").each(function(){
+			if(this.selected){
+				indeks=$(this).index()-1;
+				console.log("IndeksGumba je "+indeks);
+			}
+			
+		});
+
+		if(indeks!=-1){
+			var objektSkupine = tabelaSkupin[indeks];
+			console.log(objektSkupine);
+			var tabelaPozicij=[];
+		    $('#podatkiOZaposlenih input:checked').each(function(){
+			       		tabelaPozicij.push($(this).parent().parent().index());
+			});
+			var tabelaIzbranihZaposlenih=[];
+			for(var i=0; i<tabelaPozicij.length; i++){
+				tabelaIzbranihZaposlenih.push( tabelaIskanihZaposlenih[tabelaPozicij[i]]);
+			}
+
+			
+				for(var i=0; i<tabelaIzbranihZaposlenih.length; i++){
+					console.log(tabelaIzbranihZaposlenih[i]);
+					odstraniZaposlenegaIzSkupine(tabelaIzbranihZaposlenih[i],objektSkupine);
+				}
+		}
+		
+	});
+}
+
+function odstraniZaposlenegaIzSkupine(objektZaposlenega,objektSkupina){
+
+	var zaposleni=objektZaposlenega;
+	var jeVSkupini=false;
+	for(var i=0; i<zaposleni.skupine.length;i++){
+		if(zaposleni.skupine[i].idSkupina==objektSkupina.id_skupina){
+			console.log("Oseba ni vsebovana v skupini!");
+			jeVSkupini=true;
+			
+		}
+		
+	}
+	// če oseba še ni v teji skupini jo dodamo
+	if(jeVSkupini){
+		$.ajax({
+		    type: "POST",
+		    url: "/odstraniIzSkupine",
+		    dataType: 'json',
+		    contentType: 'application/json', 
+		    async: true,
+		    data: JSON.stringify({ idZaposlenega: objektZaposlenega.id, idSkupine:objektSkupina.id_skupina}),
+
+		    success: function (odgovor){
+	            odgovor=JSON.parse(odgovor);
+		        if(odgovor.uspeh){
+		            $("#gumb-iskanje").click();
+	            }else{
+	            	
+	            }
+		    },
+		    error: function (napaka){
+		    	
+		    }	
+		});
+	}
+	
 }
 
 function prikaziSkupineDomov(){
@@ -277,67 +417,78 @@ function sortirajTabeloZaposlenih(){
 }
 
 function gumb_izbrisiZaposlenega(){
-	$("#izbrisiZaposlenega").click(function(){
 
-		var tabelaPozicij=[];
-	    $('#podatkiOZaposlenih input:checked').each(function(){
-		       		tabelaPozicij.push($(this).parent().parent().index());
-		});
-	    var tabelaIDjevIzbranihZaposlenih = pridobiTabeloIdjevZaposlenih(tabelaPozicij);
+	    $( '#izbrisiZaposlenega' ).bootstrap_confirm_delete(
+        {
+            debug:              false,
+            heading:            'Brisanje',
+            message:            'Ali si prepričan izbrisati označene zaposlene iz imenika?',
+            btn_ok_label:       'Izbriši',
+            btn_cancel_label:   'Prekliči',
 
-	    for(var i=0; i<tabelaIDjevIzbranihZaposlenih.length; i++){
-	    	$.ajax({
-			    type: "POST",
-			    url: "/izbrisiZaposlenega",
-			    dataType: 'json',
-			    contentType: 'application/json', 
-			    async: true,
-			    data: JSON.stringify({ idUporabnika: tabelaIDjevIzbranihZaposlenih[i]}),
+            delete_callback:    function() { 
+            	
+            	var tabelaPozicij=[];
+			    $('#podatkiOZaposlenih input:checked').each(function(){
+				       		tabelaPozicij.push($(this).parent().parent().index());
+				});
+			    var tabelaIDjevIzbranihZaposlenih = pridobiTabeloIdjevZaposlenih(tabelaPozicij);
 
-			    success: function (odgovor){
-		            odgovor=JSON.parse(odgovor);
-			        if(odgovor.uspeh){
-			            clearTimeout(timer5);
-			            $("#gumb-iskanje").click();
-			            $("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-success"});
-						$("#izbrisiZaposlenega-okvir").css({
-						"display" : ""
-						});
-						$("#izbrisiZaposlenega-okvir span").html(odgovor.sporocilo);
+            	for(var i=0; i<tabelaIDjevIzbranihZaposlenih.length; i++){
+			    	$.ajax({
+					    type: "POST",
+					    url: "/izbrisiZaposlenega",
+					    dataType: 'json',
+					    contentType: 'application/json', 
+					    async: true,
+					    data: JSON.stringify({ idUporabnika: tabelaIDjevIzbranihZaposlenih[i]}),
 
-						timer5 = setTimeout(function() {
-			            $("#izbrisiZaposlenega-okvir").hide('slow');
-			        	}, 4000);	
-		            }else{
-		            	clearTimeout(timer5);
-		            	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
-						$("#izbrisiZaposlenega-okvir").css({
-						"display" : ""
-						});
-						$("#izbrisiZaposlenega-okvir span").text(odgovor.sporocilo);
+					    success: function (odgovor){
+				            odgovor=JSON.parse(odgovor);
+					        if(odgovor.uspeh){
+					            clearTimeout(timer5);
+					            $("#gumb-iskanje").click();
+					            $("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-success"});
+								$("#izbrisiZaposlenega-okvir").css({
+								"display" : ""
+								});
+								$("#izbrisiZaposlenega-okvir span").html(odgovor.sporocilo);
 
-						timer5= setTimeout(function() {
-			            $("#izbrisiZaposlenega-okvir").hide('slow');
-			        	}, 4000);	
-		            }
+								timer5 = setTimeout(function() {
+					            $("#izbrisiZaposlenega-okvir").hide('slow');
+					        	}, 4000);	
+				            }else{
+				            	clearTimeout(timer5);
+				            	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+								$("#izbrisiZaposlenega-okvir").css({
+								"display" : ""
+								});
+								$("#izbrisiZaposlenega-okvir span").text(odgovor.sporocilo);
 
-			    },
-			    error: function (napaka){
-			    	clearTimeout(timer5);
-			    	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
-					$("#izbrisiZaposlenega-okvir").css({
-					"display" : ""
-					});
-					$("#izbrisiZaposlenega-okvir span").text("NAPAKA! Težava z AJAX zahtevkom.");
+								timer5= setTimeout(function() {
+					            $("#izbrisiZaposlenega-okvir").hide('slow');
+					        	}, 4000);	
+				            }
 
-					timer3 = setTimeout(function() {
-		            $("#izbrisiZaposlenega-okvir").hide('slow');
-		        	}, 4000);
-			    }	
-			});	
-	    }
-		
-	});
+					    },
+					    error: function (napaka){
+					    	clearTimeout(timer5);
+					    	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+							$("#izbrisiZaposlenega-okvir").css({
+							"display" : ""
+							});
+							$("#izbrisiZaposlenega-okvir span").text("NAPAKA! Težava z AJAX zahtevkom.");
+
+							timer3 = setTimeout(function() {
+				            $("#izbrisiZaposlenega-okvir").hide('slow');
+				        	}, 4000);
+					    }	
+					});	
+	    		}
+             },
+            cancel_callback:    function() { }
+        }
+    );
 }
 
 function pridobiTabeloIdjevZaposlenih(tabelaPozicij){
@@ -1016,6 +1167,24 @@ function izpisiVseSkupine(tabelaSkupin){
 	$("#seznam-skupin").append(html);
 }
 
+/*function sortirajPoImenuSkupine(){
+	$("#sortirajPoImenuSkupine").click(function(){
+		var temp;
+		for(var interval=0; interval<tabelaSkupin.length; interval++){
+			for(var i=1; i<tabelaSkupin.length; i++){
+				if(tabelaSkupin[i-1].ime_skupina > tabelaSkupin[i].ime_skupina){
+					temp= tabelaSkupin[i-1];
+					tabelaSkupin[i-1]=tabelaSkupin[i];
+					tabelaSkupin[i]=temp;
+				}
+			}
+		}
+		izpisiVseSkupine(tabelaSkupin);
+		prikaziSkupine("registracija-izberiSkupine");
+		prikaziSkupineDomov();
+	});
+}*/
+
 function gumbOsveziSkupine(){
 	$("#gumb-osvezi").click(function(){
 		pridobiVseSkupine();
@@ -1136,6 +1305,22 @@ function izpisiVsaDelovnaMesta(tabelaDelovnihMest){
 	$("#seznamDelovnihMest").append(html);
 }
 
+/*
+function sortirajPoImenuDelovnegaMesta(){
+	$("#sortirajPoImenuDelovnegaMesta").click(function(){
+		var temp;
+		for(var interval=0; interval<tabelaDelovnihMest.length; interval++){
+			for(var i=1; i<tabelaDelovnihMest.length; i++){
+				if(tabelaDelovnihMest[i-1].ime_del_mesto > tabelaDelovnihMest[i].ime_del_mesto){
+					temp= tabelaDelovnihMest[i-1];
+					tabelaDelovnihMest[i-1]=tabelaDelovnihMest[i];
+					tabelaDelovnihMest[i]=temp;
+				}
+			}
+		}
+		izpisiVsaDelovnaMesta(tabelaDelovnihMest);
+	});
+}*/
 
 function izpisiTabelo(tabela){
 	for(var i=0; i<tabela.length; i++){

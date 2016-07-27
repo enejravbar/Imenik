@@ -512,6 +512,85 @@ streznik.post("/izbrisiZaposlenega", function(zahteva,odgovor){
     });
 })
 
+streznik.post("/dodajVSkupino", function(zahteva,odgovor){
+
+    var idZaposlenega = zahteva.body.idZaposlenega;
+    var idSkupine = zahteva.body.idSkupine;
+
+    console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
+    
+    pool.getConnection(function(napaka1, connection) {
+        if (!napaka1) {
+
+                connection.query('INSERT INTO skupine_uporabnik (id_uporabnik,id_skupina) VALUES (\''+idZaposlenega+'\',\''+idSkupine+'\');', function(napaka2, vrstice) {
+                    if (!napaka2) {
+                        odgovor.json(JSON.stringify({
+                            uspeh: true,
+                            sporocilo:"Oseba uspešno dodana v skupino!"
+                        }));
+                    } else {
+                        odgovor.json(JSON.stringify({
+                            uspeh: false,
+                            sporocilo: "NAPAKA! Oseba ni bila dodana v skupino!"
+                        }));
+                        console.log(napaka2);
+                        return;
+                    }
+
+                });
+            
+            connection.release();
+
+        } else {
+            odgovor.json(JSON.stringify({
+                uspeh: false,
+                id: null,
+                sporocilo: "NAPAKA! Ni povezave z pod. bazo."
+            }));
+        }
+    });
+})
+
+streznik.post("/odstraniIzSkupine", function(zahteva,odgovor){
+
+    var idZaposlenega = zahteva.body.idZaposlenega;
+    var idSkupine = zahteva.body.idSkupine;
+
+    console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
+    
+    pool.getConnection(function(napaka1, connection) {
+        if (!napaka1) {
+
+                connection.query('DELETE FROM skupine_uporabnik WHERE id_skupina =\''+idSkupine+'\' AND id_uporabnik =\''+idZaposlenega+'\';', function(napaka2, vrstice) {
+                    if (!napaka2) {
+                        odgovor.json(JSON.stringify({
+                            uspeh: true,
+                            sporocilo:"Oseba uspešno odstranjena iz skupine!"
+                        }));
+                    } else {
+                        odgovor.json(JSON.stringify({
+                            uspeh: false,
+                            sporocilo: "NAPAKA! Oseba ni odstranjena!"
+                        }));
+                        console.log(napaka2);
+                        return;
+                    }
+
+                });
+            
+            connection.release();
+
+        } else {
+            odgovor.json(JSON.stringify({
+                uspeh: false,
+                id: null,
+                sporocilo: "NAPAKA! Ni povezave z pod. bazo."
+            }));
+        }
+    });
+})
+
+
 streznik.get("*", function(zahteva, odgovor) {
     odgovor.redirect("/");
 })
@@ -676,6 +755,7 @@ function preveriPripadnostSkupini(idSkupina, tabelaSkupinZaposlenega){
             return true;
         console.log("Skupina je ustrezen");
         }
+        
     }
     console.log("Skupina ni ustrezen");
     return false;
