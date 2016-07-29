@@ -6,8 +6,12 @@ var tabelaDelovnihMest=[];
 var tabelaIskanihZaposlenih = [];
 
 var idTrenutnegaObravnavanegaZaposlenega;
+var zadnjaVrstaSortiranja = null;
 
 $(document).ready(function(){
+
+	testirajAplikacijo();
+
 	izberiZavihek();
 	skrijIskalnik();
 	oznaciVse();
@@ -64,6 +68,44 @@ $(document).ready(function(){
 
 // --------------------------------- UREDI ZAPOSLENEGA ---------------------------------
 
+function testirajAplikacijo(){
+	console.log("Povezava z bazo: " + testPovezaveSPodatkovnoBazo());
+	$('#pojavnoOkno-testAplikacija').modal('show');
+	setTimeout(function(){
+		if(testPovezaveSPodatkovnoBazo()){
+			$("#gumb-iskanje").click();
+		$('#pojavnoOkno-testAplikacija').modal('hide');
+		}else{
+			window.location.replace("/napaka");
+		}
+	}, 500);
+
+	
+
+}
+
+function testPovezaveSPodatkovnoBazo(){
+	var status=false;
+	$.ajax({
+		    type: "POST",
+		    url: "/seznamSkupin",
+		    dataType: 'json',
+		    contentType: 'application/json', 
+		    async: false,
+		    data: JSON.stringify({}),
+
+		    success: function (odgovor){
+	                odgovor=JSON.parse(odgovor);
+	                //console.log("Tabela "+odgovor.podatki);
+	                //tabelaSkupin = odgovor.podatki;
+	                status=odgovor.uspeh;
+
+		    }
+	});
+
+	return status; 
+}
+
 function urediZaposlenega(){
 	$("#gumb-urediZaposlenega").click(function(){
 		
@@ -112,7 +154,7 @@ function urediZaposlenega(){
 			        if(odgovor.vpisano){
 
 			           urediZaposlenega_izbrisiZaposlenega(idTrenutnegaObravnavanegaZaposlenega);
-			           prikaziIskaneZaposlene(tabelaIskanihZaposlenih);
+			           $("#gumb-iskanje").click();
 		            }else{
 		            	
 		            }
@@ -624,6 +666,7 @@ function isciZaposlene(){
 			        	}, 4000);	
 		            }else{
 		            	tabelaIskanihZaposlenih = sporocilo.podatki;
+		            	sortirajKotPrejsnic();
 		            	prikaziIskaneZaposlene(tabelaIskanihZaposlenih);
 		            	console.log("SPOROCILO.PODATKI : " + tabelaIskanihZaposlenih);
 		            }
@@ -644,6 +687,28 @@ function isciZaposlene(){
 			});
 		//console.log(ime+" " + priimek +" " +naslov+ " " +email+" "+mobSt+" " +kratkaMobSt+" "+stacSt+" "+kratkaStacSt);
 	});
+}
+
+function sortirajKotPrejsnic(){
+	console.log("Zadnjič sem sortiral po številki " + zadnjaVrstaSortiranja);
+	switch(zadnjaVrstaSortiranja){
+		case null: 
+					$("#urediPoImenu").click(); 
+					break;
+
+		case 0: 
+					$("#urediPoImenu").click(); 
+					break;
+		
+		case 1: 	$("#urediPoPriimku").click(); 
+					break;
+		
+		case 2: 	$("#urediPoNaslovu").click(); 
+					break;
+		
+		case 3: 	$("#urediPoDelovnemMestu").click(); 
+					break;
+	}
 }
 
 function gumb_dodajZaposlenegaVSkupino(){
@@ -875,7 +940,9 @@ function sortirajTabeloZaposlenih(){
 
 	$("#urediPoImenu").click(function(){
 		var temp="";
-		console.log("Sortiram tabelo zaposlenih!");
+
+		zadnjaVrstaSortiranja=0;
+		console.log("Sortiram tabelo PO IMENU!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
 				if(tabelaIskanihZaposlenih[i-1].ime > tabelaIskanihZaposlenih[i].ime){
@@ -890,7 +957,8 @@ function sortirajTabeloZaposlenih(){
 
 	$("#urediPoPriimku").click(function(){
 		var temp="";
-		console.log("Sortiram tabelo zaposlenih!");
+		zadnjaVrstaSortiranja=1;
+		console.log("Sortiram tabelo PO PRIIMKU!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
 				if(tabelaIskanihZaposlenih[i-1].priimek > tabelaIskanihZaposlenih[i].priimek){
@@ -905,7 +973,8 @@ function sortirajTabeloZaposlenih(){
 
 	$("#urediPoNaslovu").click(function(){
 		var temp="";
-		console.log("Sortiram tabelo zaposlenih!");
+		zadnjaVrstaSortiranja=2;
+		console.log("Sortiram tabelo PO NASLOVU!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
 				if(tabelaIskanihZaposlenih[i-1].naslov > tabelaIskanihZaposlenih[i].naslov){
@@ -920,7 +989,8 @@ function sortirajTabeloZaposlenih(){
 
 	$("#urediPoDelovnemMestu").click(function(){
 		var temp="";
-		console.log("Sortiram tabelo zaposlenih!");
+		zadnjaVrstaSortiranja=3;
+		console.log("Sortiram tabelo PO DELOVNEM MESTU!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
 				if(tabelaIskanihZaposlenih[i-1].delMesto > tabelaIskanihZaposlenih[i].delMesto){
@@ -1035,7 +1105,7 @@ function kreirajSeznamMailovZaPosiljanje(){
     $('#podatkiOZaposlenih input:checked').each(function(){
 	       		tabelaIndeksov.push($(this).parent().parent().index());
 	});
-	console.log("izbrani so " + tabelaIndeksov);
+	//console.log("izbrani so " + tabelaIndeksov);
     var seznamMailov="";
     var poz;
     for(var j=0; j<tabelaIndeksov.length;j++){
@@ -1052,7 +1122,7 @@ function kreirajSeznamMailovZaPosiljanje(){
     		
     	}
     }
-    console.log("Izbrani emaili so: " + seznamMailov);
+    //console.log("Izbrani emaili so: " + seznamMailov);
     return seznamMailov;
 }
 
@@ -1145,13 +1215,13 @@ function obdelajCSVTextInUvozi(csvText){
 				zaposleniZaUvoziti.tabelaStacStevilk.push(objStacSt);
 
 				tabelaZaposleniZaUvoziti.push(zaposleniZaUvoziti);
-				console.log(zaposleniZaUvoziti);
+				//console.log(zaposleniZaUvoziti);
 				stevec=-1;
 			}
 			stevec++;
 		}
 	}
-	console.log(tabelaZaposleniZaUvoziti); 
+	//console.log(tabelaZaposleniZaUvoziti); 
 
 	for(var i=0; i<tabelaZaposleniZaUvoziti.length; i++){
 
@@ -1414,11 +1484,11 @@ function registrirajNovegaZaposlenega(){
 			
 		}
 
-		console.log("delovno mesto "+ delovnoMesto);
+		/*console.log("delovno mesto "+ delovnoMesto);
 		console.log("izbira skupine "+ izbiraSkupine);
 		console.log("tabela mailov "+ tabelaEmailov);
 		console.log("tabela mobilnih stevilk "+tabelaMobStevilk);
-		console.log("tabela stacionarnih stevilk "+tabelaStacStevilk);
+		console.log("tabela stacionarnih stevilk "+tabelaStacStevilk);*/
 
 	});
 		
