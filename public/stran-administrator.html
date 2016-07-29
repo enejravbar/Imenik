@@ -13,7 +13,7 @@
       <script src="knjiznice/bootstrap-v3.3.6/js/bootstrap.js"></script>
       <script src="knjiznice/bootstrap-v3.3.6/js/bootstrap-confirm-delete.js"></script>
       <script src="knjiznice/bootstrap-v3.3.6/js/bootstrap.fd.js"></script>
-      <script src="js/koda.js"></script>
+      <script src="js/koda-administrator.js"></script>
       <script src="js/administrator.js"></script>
 
       <style>
@@ -44,7 +44,7 @@
                      <li><a id="povezava-Domov" class="active kategorija" style="background-color:#111;">Domov</a></li>
                      <li><a id="povezava-DodajNovVpis" class="kategorija">Dodaj nov vpis</a></li>
                      <li><a id="povezava-Skupine" class="kategorija">Dodaj skupino/del. mesto</a></li>
-                                <li><a id="povezava-Podrobnosti" class="kategorija">Podrobnosti</a></li> 
+                               <!-- <li><a id="povezava-Podrobnosti" class="kategorija">Podrobnosti</a></li> --> 
                   </ul>
                </div>
                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -225,6 +225,131 @@
 			                     </table>
 		                  </div>
 		                </div>
+                      <!-- BOOTSTRAP MODAL uredi zaposlenega-->
+                  
+                      <div id="urediZaposlenega" class="modal fade" role="dialog">
+                          <div class="modal-dialog" style="width:80%">
+
+                            <!-- Modal content-->
+                            <div class="modal-content" >
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Uredi podatke o zaposlenemu</h4>
+                              </div>
+                              <div class="modal-body">
+                                 
+                              
+                                 <div id="urediZaposlenega-forma" style="display:block;">
+                                 <div class="row" >
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4  ">
+                                       <label for="ime" class="control-label" style="margin-top:20px;">Ime:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-ime" type="ime" class="form-control" style="">
+                                       </div>
+                                       <label for="priimek" class="control-label" style="margin-top:10px;">Priimek:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-priimek" type="priimek" class="form-control">
+                                       </div>
+                                       <label  class="control-label" style="margin-top:10px;">Naslov:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-naslov" type="Datumrojstva" class="form-control">
+                                       </div>
+                                       <label  class="control-label" style="margin-top:10px;">Skupina:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <select id="urediZaposlenega-izberiSkupine" style="float:left;" multiple>
+                                          </select>
+                                          <div id="urediZaposlenega-izberiSkupine-okvir" class="bg-danger fade-in obvestilo" style="display:none;float:left; margin-left:15px; margin-top:8px;padding:6px; ">
+                                                   <span>Napaka skupina ni izbrana!</span>
+                                          </div>
+                                       </div>
+                                       <label  class="control-label" style="margin-top:10px;">Delovno mesto:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <select id="urediZaposlenega-delovnoMesto">
+                                          </select>
+                                          
+                                       </div>
+                                       <label for="" class="control-label" style="margin-top:40px;">E-mail naslov:</label>
+                                       <div id="urediZaposlenega-emailNaslov" class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-dodajEmail" type="Urarojstva" class="form-control" style="display:inline;">
+                                          <button id="urediZaposlenega-dodajEmail-gumb" class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
+                                       </div>
+                                       <table id="urediZaposlenega-tabela-seznam-emailov" class="table table-hover" style="margin-top:20px;">
+                                          <thead>
+                                             <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                                <th>E-mail naslov</th>
+                                                <th></th>
+                                             </tr>
+                                          </thead>
+                                          <tbody id="urediZaposlenega-seznam-emailov">
+                                             
+                                          </tbody>
+                                       </table>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="margin-top:15px;">
+                                       <label for="" class="control-label" >Mobilna številka:</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input  id="urediZaposlenega-dodajMobStevilko" type="text" class="form-control">
+                                       </div>
+                                       <label for="" class="control-label" style="margin-top:10px;" >Kratka mobilna številka</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input  id="urediZaposlenega-dodajKratkoMobStevilko" type="Urarojstva" class="form-control">
+                                          <button id="urediZaposlenega-dodajMobStevilko-gumb" class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
+                                       </div>
+                                       <table id="urediZaposlenega-tabela-seznam-mobStevilk" class="table table-hover" style="margin-top:20px;">
+                                          <thead>
+                                             <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                                <th>Mobilna št.</th>
+                                                <th>Kratka mob. št.</th>
+                                                <th></th>
+                                             </tr>
+                                          </thead>
+                                          <tbody id="urediZaposlenega-seznam-mobStevilk">
+                                             
+                                          </tbody>
+                                       </table>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="margin-top:15px;">
+                                       <label for="" class="control-label" >Stacionarna številka</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-dodajStacStevilko" type="Urarojstva" class="form-control">
+                                       </div>
+                                       <label for="" class="control-label" style="margin-top:10px;">Kratka stacionarna številka</label>
+                                       <div class="input-group col-xs-12 col-sm-12">
+                                          <input id="urediZaposlenega-dodajKratkoStacStevilko" type="Urarojstva" class="form-control">
+                                          <button id="urediZaposlenega-dodajStacStevilko-gumb" class="btn btn-sm btn-primary" style="margin-top:10px;"> Dodaj</button>
+                                       </div>
+                                       <table id="urediZaposlenega-tabela-seznam-stacStevilk" class="table table-hover" style="margin-top:20px;">
+                                          <thead>
+                                             <tr style="background-color:rgba(37, 156, 236, 0.5)">
+                                                <th>Stacionarna št.</th>
+                                                <th>Kratka stac. št.</th>
+                                                <th></th>
+                                             </tr>
+                                          </thead>
+                                          <tbody id="urediZaposlenega-seznam-stacStevilk">
+                                             
+                                          </tbody>
+                                       </table>
+                                    </div>
+                                 </div>
+                                
+                              </div> 
+
+                             
+                              </div>
+
+                              <div class="modal-footer">
+                               <button id="gumb-urediZaposlenega" type="submit" class="btn btn-success btn-md" style=" left:15px;    position:absolute;">Shrani spremembe</button>   
+                               <div id="gumb-urediZaposlenega-okvir" class="fade-in obvestilo" style="display:none; position:absolute;left:180px; padding:6px; ">
+                                                   <span></span>
+                                    </div>
+                                <button id="zapriUrejanje" type="button" class="btn btn-default" data-dismiss="modal">Zapri</button>
+                              </div>
+                            </div>
+
+                          </div> 
+                     </div>    
+                      <!-- KONEC - BOOTSTRAP MODAL uredi zaposlenega-->
                   </div>
                   <!-- KONEC DOMOV -->
                   <!-- DODAJ NOV VPIS -->         
@@ -344,7 +469,7 @@
                                  </div>
                            </div>
                         </div>
-                        <div id="tabelaSkupin" class="col-xs-12 col-sm-12 col-md-5 col-lg-5" style="margin-top:15px;">
+                        <div  class="col-xs-12 col-sm-12 col-md-5 col-lg-5" style="margin-top:15px;">
                            
                            <table style="margin-bottom:0px; padding-bottom:0px; margin-top:30px;" class="table table-hover">
                               <thead  style="background-color: rgba(37, 156, 236,0.5);">

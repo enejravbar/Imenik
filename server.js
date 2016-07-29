@@ -72,6 +72,13 @@ streznik.get("/login", function(zahteva, odgovor) {
     
 })
 
+streznik.get("/napaka", function(zahteva, odgovor) {
+    
+    
+        odgovor.sendFile(path.join(__dirname, 'public', 'napaka.html'));
+  
+})
+
 streznik.post("/odjava", function(zahteva, odgovor) {
     zahteva.session.uporabnik = null;
     odgovor.json(JSON.stringify({
@@ -510,7 +517,7 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
                                     
                                     connection.query('SELECT u.id_uporabnik, stac.dolga_stac, stac.kratka_stac FROM uporabnik u, stacionarne_stevilke stac WHERE u.id_uporabnik = stac.id_uporabnik;', function(napaka5, tabelaStacStevilke) {
                                         if (!napaka5) {
-                                            connection.query('SELECT u.id_uporabnik, d.ime_del_mesto FROM uporabnik u, delovno_mesto d WHERE u.id_del_mesto = d.id_del_mesto;', function(napaka6, tabelaDelMesto) {
+                                            connection.query('SELECT u.id_uporabnik, d.id_del_mesto, d.ime_del_mesto FROM uporabnik u, delovno_mesto d WHERE u.id_del_mesto = d.id_del_mesto;', function(napaka6, tabelaDelMesto) {
                                                 if (!napaka6) {
                                                     connection.query('SELECT u.id_uporabnik, s.id_skupina, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
                                                         if (!napaka7) {
@@ -790,6 +797,7 @@ function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevil
             ime : tabelaUporabnik[i].ime,
             priimek : tabelaUporabnik[i].priimek,
             naslov : tabelaUporabnik[i].naslov,
+            idDelMesto: "",
             delMesto : "",
             email : [],
             mobStevilke : [],
@@ -800,6 +808,7 @@ function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevil
         for(var j=0; j<tabelaDelMesto.length; j++){
             if(tabelaDelMesto[j].id_uporabnik == idZaposlenega){
                zaposlenaOseba.delMesto = tabelaDelMesto[j].ime_del_mesto;
+               zaposlenaOseba.idDelMesto = tabelaDelMesto[j].id_del_mesto;
             }
         }
 
