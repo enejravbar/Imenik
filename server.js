@@ -35,9 +35,9 @@ streznik.use(
 );
 
 var pool = mysql.createPool({
-    host: '10.10.101.71',
-    user: 'imenik',
-    password: 'imenik',
+    host: 'localhost',
+    user: 'root',
+    password: 'dobrodelo',
     database: 'imenik',
     charset: 'UTF8_GENERAL_CI'
 });
@@ -173,7 +173,7 @@ streznik.post("/seznamSkupin", function(zahteva, odgovor) {
 
         } else {
             odgovor.json(JSON.stringify({
-                vpisano: false,
+                uspeh: false,
                 id: null,
                 sporocilo: "NAPAKA! Ni povezave z pod. bazo."
             }));

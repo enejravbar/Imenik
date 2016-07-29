@@ -67,6 +67,9 @@ function testPovezaveSPodatkovnoBazo(){
 
 function isciZaposlene(){
 	$("#gumb-iskanje").click(function(){
+
+
+
 		var ime=$("#iskanje-ime").val();
 		var priimek=$("#iskanje-priimek").val();
 		var naslov=$("#iskanje-naslov").val();
@@ -113,6 +116,7 @@ function isciZaposlene(){
 		          	var sporocilo=JSON.parse(odgovor);  
 			        if(!sporocilo.uspeh){
 			        	
+			        	prikaziSkupineDomov(); // vsakič ko iščemo zaposlene še posobobimo tabelo skupin, v primeru da pride do novih vnosov
 			        	prikaziIskaneZaposlene(odgovor);
 			            clearTimeout(timer4);
 			            $("#prijava-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
@@ -151,7 +155,6 @@ function isciZaposlene(){
 }
 
 function sortirajKotPrejsnic(){
-	console.log("Zadnjič sem sortiral po številki " + zadnjaVrstaSortiranja);
 	switch(zadnjaVrstaSortiranja){
 		case null: $("#urediPoImenu").click(); break;
 		case 0: $("#urediPoImenu").click(); break;
@@ -261,8 +264,12 @@ function prikaziIskaneZaposlene(tabelaZaposlenih){
 
 	var html="";
 	console.log(tabelaZaposlenih);
+	if(tabelaZaposlenih.length==0){
+		html="<tr><td align=\"center\" colspan=\"11\">Ni zadetkov!</td></tr>";
+		$("#podatkiOZaposlenih").append(html);
 
-	for(var i=0; i<tabelaZaposlenih.length; i++){
+	}else{
+		for(var i=0; i<tabelaZaposlenih.length; i++){
 		html="<tr>"+
              "   <td><input type=\"checkbox\"></td>" +
              "   <td>"+tabelaZaposlenih[i].ime+"</td> "+
@@ -325,7 +332,9 @@ function prikaziIskaneZaposlene(tabelaZaposlenih){
 
              $("#podatkiOZaposlenih").append(html);
 
+		}	
 	}
+	
 }
 
 function sortirajTabeloZaposlenih(){

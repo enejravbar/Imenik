@@ -867,72 +867,77 @@ function prikaziIskaneZaposlene(tabelaZaposlenih){
 
 	var html="";
 	console.log(tabelaZaposlenih);
+	if(tabelaZaposlenih.length==0){
+		html="<tr><td align=\"center\" colspan=\"12\">Ni zadetkov!</td></tr>";
+		$("#podatkiOZaposlenih").append(html);
 
-	for(var i=0; i<tabelaZaposlenih.length; i++){
-		html="<tr>"+
-             "   <td><input type=\"checkbox\"></td>" +
-             "   <td>"+tabelaZaposlenih[i].ime+"</td> "+
-             "   <td>"+tabelaZaposlenih[i].priimek+"</td> "+
-             "   <td>"+tabelaZaposlenih[i].naslov+"</td> "+
-             "   <td>";
-             for(var j=0; j<tabelaZaposlenih[i].skupine.length; j++){
-             	if( j== tabelaZaposlenih[i].skupine.length-1 ){
-             		html+= tabelaZaposlenih[i].skupine[j].imeSkupina+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].skupine[j].imeSkupina+"<br>";
-             }
+	}else{
+		for(var i=0; i<tabelaZaposlenih.length; i++){
+			html="<tr>"+
+	             "   <td><input type=\"checkbox\"></td>" +
+	             "   <td>"+tabelaZaposlenih[i].ime+"</td> "+
+	             "   <td>"+tabelaZaposlenih[i].priimek+"</td> "+
+	             "   <td>"+tabelaZaposlenih[i].naslov+"</td> "+
+	             "   <td>";
+	             for(var j=0; j<tabelaZaposlenih[i].skupine.length; j++){
+	             	if( j== tabelaZaposlenih[i].skupine.length-1 ){
+	             		html+= tabelaZaposlenih[i].skupine[j].imeSkupina+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].skupine[j].imeSkupina+"<br>";
+	             }
 
-             html+= "<td>"+tabelaZaposlenih[i].delMesto+"</td> <td>";
+	             html+= "<td>"+tabelaZaposlenih[i].delMesto+"</td> <td>";
 
-             for(var j=0; j<tabelaZaposlenih[i].email.length; j++){
-             	if(j == tabelaZaposlenih[i].email.length-1 ){
-             		html+= tabelaZaposlenih[i].email[j]+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].email[j]+"<br>";
-             }
+	             for(var j=0; j<tabelaZaposlenih[i].email.length; j++){
+	             	if(j == tabelaZaposlenih[i].email.length-1 ){
+	             		html+= tabelaZaposlenih[i].email[j]+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].email[j]+"<br>";
+	             }
 
-             html+="<td>";
+	             html+="<td>";
 
-             for(var j=0; j<tabelaZaposlenih[i].mobStevilke.length; j++){
-             	if(j == tabelaZaposlenih[i].mobStevilke.length-1 ){
-             		html+= tabelaZaposlenih[i].mobStevilke[j].mob_dolga+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].mobStevilke[j].mob_dolga+"<br>";
-             }
+	             for(var j=0; j<tabelaZaposlenih[i].mobStevilke.length; j++){
+	             	if(j == tabelaZaposlenih[i].mobStevilke.length-1 ){
+	             		html+= tabelaZaposlenih[i].mobStevilke[j].mob_dolga+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].mobStevilke[j].mob_dolga+"<br>";
+	             }
 
-             html+="<td>";
+	             html+="<td>";
 
-             for(var j=0; j<tabelaZaposlenih[i].mobStevilke.length; j++){
-             	if(j == tabelaZaposlenih[i].mobStevilke.length-1 ){
-             		html+= tabelaZaposlenih[i].mobStevilke[j].mob_kratka+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].mobStevilke[j].mob_kratka+"<br>";
-             }
+	             for(var j=0; j<tabelaZaposlenih[i].mobStevilke.length; j++){
+	             	if(j == tabelaZaposlenih[i].mobStevilke.length-1 ){
+	             		html+= tabelaZaposlenih[i].mobStevilke[j].mob_kratka+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].mobStevilke[j].mob_kratka+"<br>";
+	             }
 
-             html+="<td>";
+	             html+="<td>";
 
-             for(var j=0; j<tabelaZaposlenih[i].stacStevilke.length; j++){
-             	if(j == tabelaZaposlenih[i].stacStevilke.length-1 ){
-             		html+= tabelaZaposlenih[i].stacStevilke[j].stac_dolga+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].stacStevilke[j].stac_dolga+"<br>";
-             }
+	             for(var j=0; j<tabelaZaposlenih[i].stacStevilke.length; j++){
+	             	if(j == tabelaZaposlenih[i].stacStevilke.length-1 ){
+	             		html+= tabelaZaposlenih[i].stacStevilke[j].stac_dolga+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].stacStevilke[j].stac_dolga+"<br>";
+	             }
 
-             html+="<td>";
+	             html+="<td>";
 
-             for(var j=0; j<tabelaZaposlenih[i].stacStevilke.length; j++){
-             	if(j == tabelaZaposlenih[i].stacStevilke.length-1 ){
-             		html+= tabelaZaposlenih[i].stacStevilke[j].stac_kratka+"</td>";
-             	}
-             	html+= tabelaZaposlenih[i].stacStevilke[j].stac_kratka+"<br>";
-             }
-             html+= "<td>" +
-                    "   <button style=\"margin-top:5px;\" class=\"urediZaposlenega btn btn-primary btn-sm\" data-target=\"#urediZaposlenega\" data-toggle=\"modal\">Uredi</button>" + 
-                    "</td>" + 
-                    "</tr>";
+	             for(var j=0; j<tabelaZaposlenih[i].stacStevilke.length; j++){
+	             	if(j == tabelaZaposlenih[i].stacStevilke.length-1 ){
+	             		html+= tabelaZaposlenih[i].stacStevilke[j].stac_kratka+"</td>";
+	             	}
+	             	html+= tabelaZaposlenih[i].stacStevilke[j].stac_kratka+"<br>";
+	             }
+	             html+= "<td>" +
+	                    "   <button style=\"margin-top:5px;\" class=\"urediZaposlenega btn btn-primary btn-sm\" data-target=\"#urediZaposlenega\" data-toggle=\"modal\">Uredi</button>" + 
+	                    "</td>" + 
+	                    "</tr>";
 
-             $("#podatkiOZaposlenih").append(html);
+	             $("#podatkiOZaposlenih").append(html);
 
+		}
 	}
 }
 
@@ -1766,6 +1771,7 @@ function gumbDodajNovoSkupino(){
 		dodajNovoSkupino(imeNoveSkupine);
 		prikaziSkupine("registracija-izberiSkupine");
 		prikaziSkupineDomov();
+		urediZaposlenega_prikaziSkupine();
 	});
 }
 
@@ -1795,7 +1801,13 @@ function dodajNovoSkupino(imeNoveSkupine){
 		                    "class": "alert alert-success fade-in"
 		                });
 		                $("#dodajSkupino").html("Skupina \""+imeNoveSkupine+"\" uspešno dodana.");
-		                pridobiVseSkupine();
+		                
+		                // POSODOBI VSE IZPISE IN DROPDOWNE S SKUPINAMI
+		                $("#gumb-osvezi").click();	
+	                	prikaziSkupine("registracija-izberiSkupine");
+	                	prikaziSkupineDomov();
+	                	urediZaposlenega_prikaziSkupine("urediZaposlenega-izberiSkupine");
+
 		                timer = setTimeout(function() {
 		                    $("#dodajSkupino-okvir").hide('slow');
 		                }, 4000);
@@ -1963,6 +1975,8 @@ function gumbDodajNovoDelovnoMesto(){
 		var imeNovegaDelovnegaMesta= $("#imeNovegaDelovnegaMesta").val();
 		dodajNovoDelovnoMesto(imeNovegaDelovnegaMesta);
 		prikaziDelovnaMesta();
+		urediZaposlenega_prikaziDelovnaMesta();
+
 	});
 }
 
@@ -1983,6 +1997,8 @@ function dodajNovoDelovnoMesto(imeDelovnegaMesta){
 		    success: function (odgovor){
 	                odgovor=JSON.parse(odgovor);
 	                if(odgovor.vpisano){
+	                	
+
 	                	clearTimeout(timer1);
 						$("#dodajDelovnoMesto-okvir").css({display: ""});
 			    		$("#dodajDelovnoMesto-okvir").css({
@@ -1992,7 +2008,11 @@ function dodajNovoDelovnoMesto(imeDelovnegaMesta){
 		                    "class": "alert alert-success fade-in"
 		                });
 		                $("#dodajDelovnoMesto").html("Delovno mesto \""+imeDelovnegaMesta+"\" uspešno dodano.");
-		                pridobiVsaDelovnaMesta();
+		                
+		                $("#gumb-osvezi-del-mesta").click();	
+	                	prikaziDelovnaMesta();
+						urediZaposlenega_prikaziDelovnaMesta();
+
 		                timer1 = setTimeout(function() {
 		                    $("#dodajDelovnoMesto-okvir").hide('slow');
 		                }, 4000);
@@ -2027,7 +2047,8 @@ function pridobiVsaDelovnaMesta(){
 	                odgovor=JSON.parse(odgovor);
 	                tabelaDelovnihMest=obrniVrstniRedElementovVTabeli(odgovor.podatki);
 	                izpisiVsaDelovnaMesta(tabelaDelovnihMest);
-
+	                prikaziDelovnaMesta();
+						urediZaposlenega_prikaziDelovnaMesta();
 		    }
 	});
 	
