@@ -1,5 +1,5 @@
 
-var timer,timer1,timer2,timer3,timer4,timer5;
+var timer,timer1,timer2,timer3,timer4,timer5,timer6;
 var tabelaSkupin=[];	
 var tabelaDelovnihMest=[];
 
@@ -61,6 +61,7 @@ $(document).ready(function(){
 	gumb_dodajZaposlenegaVSkupino();
 	gumb_odstraniZaposlenegaIzSkupine();
 	naloziCSVDatoteko();
+	spremeniSkupino();
 
 	gumb_urediZaposlenega();
 	
@@ -226,6 +227,12 @@ function urediZaposlenega_izbrisiZaposlenega(idZaposlenega){
             $("#gumb-urediZaposlenega-okvir").hide('slow');
         	}, 4000);
 }	
+	});
+}
+
+function spremeniSkupino(){
+	$("#iskanje-izbiraSkupine").change(function () {
+		$("#gumb-iskanje").click();
 	});
 }
 
@@ -1097,11 +1104,23 @@ function gumb_posljiEmail(){
 	$("#poslji-email").click(function(){
 		var seznamEmailov=kreirajSeznamMailovZaPosiljanje();
 		//console.log(kreirajSeznamMailovZaPosiljanje());
-		$("#poslji-email-povezava").attr({
-			"href" : "mailto:"+seznamEmailov
-		});
+		console.log("Seznam emailov je: " + seznamEmailov);
+		if(seznamEmailov != -1){
+			$("#poslji-email-povezava").attr({
+				"href" : "mailto:"+seznamEmailov
+				
+			});
+			console.log("KOrak 2");
+			
+			$("#poslji-email-povezava").click();
+			//$("#poslji-email-povezava").removeAttr("href");
+			console.log("KOrak 3");
 
-		$("#poslji-email-povezava").click();
+		}else{
+			$("#poslji-email-povezava").removeAttr("href");
+			return;
+		}
+		
 	});
 }
 
@@ -1110,26 +1129,44 @@ function kreirajSeznamMailovZaPosiljanje(){
     $('#podatkiOZaposlenih input:checked').each(function(){
 	       		tabelaIndeksov.push($(this).parent().parent().index());
 	});
-	//console.log("izbrani so " + tabelaIndeksov);
+	console.log("izbrani so " + tabelaIndeksov);
     var seznamMailov="";
     var poz;
-    for(var j=0; j<tabelaIndeksov.length;j++){
-    	poz=tabelaIndeksov[j];
-    	for(var i=0; i< tabelaIskanihZaposlenih[poz].email.length; i++){
-    		if(i== tabelaIskanihZaposlenih[poz].email.length-1  && j== tabelaIndeksov.length-1 && tabelaIskanihZaposlenih[poz].email[i]!=undefined){
-    			
-    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i];
-    			break;
-    		}
-    		if(tabelaIskanihZaposlenih[poz].email[i]!=undefined){
-    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i]+",";
-    		}
-    		
-    	}
-    }
-    //console.log("Izbrani emaili so: " + seznamMailov);
+
+    if(tabelaIndeksov.length == 0){
+    	clearTimeout(timer6);
+    	console.log("Tabela indeksov je prazna!");
+    	$("#izbrisiZaposlenega-okvir").css({"display" : ""});
+    	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+    	$("#izbrisiZaposlenega-okvir").html("NAPAKA! Seznam e-mailov za pošiljanje je prazen!");
+    	timer6 = setTimeout(function() {
+		    $("#izbrisiZaposlenega-okvir").hide('slow');
+		}, 4000);
+
+    	return -1;
+    }else{
+    	for(var j=0; j<tabelaIndeksov.length;j++){
+	    	poz=tabelaIndeksov[j];
+	    	for(var i=0; i< tabelaIskanihZaposlenih[poz].email.length; i++){
+	    		if(i== tabelaIskanihZaposlenih[poz].email.length-1  && j== tabelaIndeksov.length-1 && tabelaIskanihZaposlenih[poz].email[i]!=undefined){
+	    			
+	    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i];
+	    			break;
+	    		}
+	    		if(tabelaIskanihZaposlenih[poz].email[i]!=undefined){
+	    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i]+",";
+	    		}
+	    		
+	    	}
+	    }	
+
+    console.log("Izbrani emaili so: " + seznamMailov);
     return seznamMailov;
+    }
+
+    
 }
+
 
 function naloziCSVDatoteko(){
 	$("#uvoziCSV").click(function() {
@@ -1258,6 +1295,7 @@ function obdelajCSVTextInUvozi(csvText){
 				    }	
 				});
 	}
+	$("#gumb-iskanje").click();
 
 }
 
@@ -1448,6 +1486,9 @@ function registrirajNovegaZaposlenega(){
 			    success: function (odgovor){
 		            odgovor=JSON.parse(odgovor);
 			        if(odgovor.vpisano){
+
+			        	$("#gumb-iskanje").click(); // posodobi tabelo iskanih zaposlenih
+
 			            clearTimeout(timer3);
 			            $("#gumb-registriraj-okvir").attr({"class" : "fade-in obvestilo bg-success"});
 						$("#gumb-registriraj-okvir").css({
@@ -1647,10 +1688,13 @@ function pridobiStacStevilke(idTabeleStacStevilk){
 
 function prikaziSkupine(idSelecta){
 	//console.log("Deluje test test test");
-	$("#"+idSelecta).html("");
+	
 	tabelaSkupin = pridobiVseSkupine();
+	//console.log("TABELA SKUPIN JE: " + tabelaSkupin);
+	//console.log("HTML " + $("#registracija-izberiSkupine").html());
+	$("#registracija-izberiSkupine").html("");
 	for(var i=0; i<tabelaSkupin.length; i++){
-		$("#"+idSelecta).append("<option>"+tabelaSkupin[i].ime_skupina+"</option>");
+		$("#registracija-izberiSkupine").append("<option>"+tabelaSkupin[i].ime_skupina+"</option>");
 	}
 	
 }

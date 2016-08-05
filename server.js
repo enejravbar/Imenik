@@ -13,8 +13,8 @@ var http = require('http');
 
 var httpServer = http.createServer(streznik);
 
-httpServer.listen(80, function() {
-    console.log("Streznik posluša na vratih 80.");
+httpServer.listen(8080, function() {
+    console.log("Streznik posluša na vratih 8080.");
 });
 
 var adminPassword = "pivkap"; // geslo administratorskega računa
@@ -35,9 +35,9 @@ streznik.use(
 );
 
 var pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'dobrodelo',
+    host: '10.10.101.71',
+    user: 'imenik',
+    password: 'imenik',
     database: 'imenik',
     charset: 'UTF8_GENERAL_CI'
 });
@@ -228,7 +228,7 @@ streznik.post("/seznamDelovnihMest", function(zahteva, odgovor) {
                         uspeh: true,
                         podatki: vrstice
                     }));
-                    console.log(vrstice);
+                    //console.log(vrstice);
                 } else {
                     odgovor.json(JSON.stringify({
                         uspeh: false,
@@ -269,11 +269,11 @@ streznik.post("/registriraj", function(zahteva, odgovor) {
             // vpisi uporabnika
             //console.log('INSERT INTO uporabnik (ime,priimek,naslov,id_del_mesto) VALUES (\''+ime+"\',\'"+priimek+"\',\'"+naslov+"\',\'"+delovnoMesto+'\');');
 
-			console.log("ID delovno mesto "+ delovnoMesto);
+			/*console.log("ID delovno mesto "+ delovnoMesto);
 			console.log("ID izbire skupin "+ izbiraSkupine);
 			console.log("tabela mailov "+ tabelaEmailov);
 			console.log("tabela mobilnih stevilk "+tabelaMobStevilk);
-			console.log("tabela stacionarnih stevilk "+tabelaStacStevilk);
+			console.log("tabela stacionarnih stevilk "+tabelaStacStevilk);*/
 
             // vnesi osebo v tabelo uporabnik in pridobi njegov ID 
 
@@ -504,7 +504,7 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
     var kratkaStacSt= zahteva.body.kratkaStacSt;
     var idSkupine = zahteva.body.idSkupine; 
 
-    console.log("Kratka stacionarna št. = " + kratkaStacSt + " Stac. st = " +stacSt);
+    //console.log("Kratka stacionarna št. = " + kratkaStacSt + " Stac. st = " +stacSt);
 
     pool.getConnection(function(napaka1, connection) {
         if (!napaka1) {
@@ -522,7 +522,7 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
                                                     connection.query('SELECT u.id_uporabnik, s.id_skupina, s.ime_skupina FROM uporabnik u, skupine s, skupine_uporabnik s_u WHERE u.id_uporabnik = s_u.id_uporabnik AND s_u.id_skupina=s.id_skupina;', function(napaka7, tabelaSkupine) {
                                                         if (!napaka7) {
                                                             var tabelaZaposlenih = kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevilke, tabelaStacStevilke, tabelaDelMesto, tabelaSkupine);
-                                                            console.log("Tabela zaposlenih: " +tabelaZaposlenih);
+                                                            //console.log("Tabela zaposlenih: " +tabelaZaposlenih);
                                                             var tabelaIskanihZaposlenih = pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, email, mobSt, kratkaMobSt, stacSt, kratkaStacSt, idSkupine);
                                                             odgovor.json(JSON.stringify({
                                                                 uspeh: true,
@@ -591,7 +591,7 @@ streznik.post("/isciZaposlene", function(zahteva, odgovor) {
 streznik.post("/izbrisiZaposlenega", function(zahteva,odgovor){
 
     var idUporabnika = zahteva.body.idUporabnika;
-    console.log("idUporabnika = " + idUporabnika);
+    //console.log("idUporabnika = " + idUporabnika);
     pool.getConnection(function(napaka1, connection) {
         if (!napaka1) {
 
@@ -629,7 +629,7 @@ streznik.post("/dodajVSkupino", function(zahteva,odgovor){
     var idZaposlenega = zahteva.body.idZaposlenega;
     var idSkupine = zahteva.body.idSkupine;
 
-    console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
+    //console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
     
     pool.getConnection(function(napaka1, connection) {
         if (!napaka1) {
@@ -668,7 +668,7 @@ streznik.post("/odstraniIzSkupine", function(zahteva,odgovor){
     var idZaposlenega = zahteva.body.idZaposlenega;
     var idSkupine = zahteva.body.idSkupine;
 
-    console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
+    //console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
     
     pool.getConnection(function(napaka1, connection) {
         if (!napaka1) {
@@ -706,7 +706,7 @@ streznik.post("/izbrisiSkupino", function(zahteva,odgovor){
 
     var idSkupine = zahteva.body.idSkupine;
    
-    console.log("id skupine je: "+idSkupine);
+    //console.log("id skupine je: "+idSkupine);
     //console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
     
     pool.getConnection(function(napaka1, connection) {
@@ -745,7 +745,7 @@ streznik.post("/izbrisiDelovnoMesto", function(zahteva,odgovor){
 
     var idDelMesto = zahteva.body.idDelMesto;
    
-    console.log("id delovnega mesta je: "+idDelMesto);
+    //console.log("id delovnega mesta je: "+idDelMesto);
     //console.log("ID skupine = " +idSkupine+ " idZaposlenega = " +idZaposlenega);
     
     pool.getConnection(function(napaka1, connection) {
@@ -791,7 +791,7 @@ function kreirajTabeloZaposlenih(tabelaUporabnik, tabelaEmailov, tabelaMobStevil
     for(var i=0; i<tabelaUporabnik.length; i++){
 
         idZaposlenega = tabelaUporabnik[i].id_uporabnik;
-        console.log("idZaposlenega = " + idZaposlenega);
+        //console.log("idZaposlenega = " + idZaposlenega);
         var zaposlenaOseba={
             id : idZaposlenega,
             ime : tabelaUporabnik[i].ime,
@@ -874,7 +874,7 @@ function pridobiTabeloIskanihZaposlenih(tabelaZaposlenih, ime, priimek, naslov, 
             tabelaSortiranihZaposlenih.push(tabelaZaposlenih[i]);
         }
     }
-    console.log(tabelaSortiranihZaposlenih);
+    //console.log(tabelaSortiranihZaposlenih);
     return tabelaSortiranihZaposlenih;
 }
 

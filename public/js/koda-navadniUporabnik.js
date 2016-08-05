@@ -1,5 +1,5 @@
 
-var timer,timer1,timer2,timer3,timer4,timer5;
+var timer,timer1,timer2,timer3,timer4,timer5,timer6;
 var tabelaSkupin=[];	
 var tabelaDelovnihMest=[];
 
@@ -19,6 +19,7 @@ $(document).ready(function(){
 	prikaziSkupineDomov();
 	isciZaposlene();
 	sortirajTabeloZaposlenih();
+	spremeniSkupino();
 
 	gumb_posljiEmail();
 	
@@ -42,6 +43,7 @@ function testirajAplikacijo(){
 	
 
 }
+
 
 function testPovezaveSPodatkovnoBazo(){
 	var status=false;
@@ -151,6 +153,12 @@ function isciZaposlene(){
 			    }	
 			});
 		//console.log(ime+" " + priimek +" " +naslov+ " " +email+" "+mobSt+" " +kratkaMobSt+" "+stacSt+" "+kratkaStacSt);
+	});
+}
+
+function spremeniSkupino(){
+	$("#iskanje-izbiraSkupine").change(function () {
+		$("#gumb-iskanje").click();
 	});
 }
 
@@ -345,7 +353,7 @@ function sortirajTabeloZaposlenih(){
 		console.log("Sortiram tabelo zaposlenih!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
-				if(tabelaIskanihZaposlenih[i-1].ime > tabelaIskanihZaposlenih[i].ime){
+				if(tabelaIskanihZaposlenih[i-1].ime.toLowerCase() > tabelaIskanihZaposlenih[i].ime.toLowerCase()){
 					temp= tabelaIskanihZaposlenih[i-1];
 					tabelaIskanihZaposlenih[i-1]=tabelaIskanihZaposlenih[i];
 					tabelaIskanihZaposlenih[i]=temp;
@@ -361,7 +369,7 @@ function sortirajTabeloZaposlenih(){
 		console.log("Sortiram tabelo zaposlenih!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
-				if(tabelaIskanihZaposlenih[i-1].priimek > tabelaIskanihZaposlenih[i].priimek){
+				if(tabelaIskanihZaposlenih[i-1].priimek.toLowerCase() > tabelaIskanihZaposlenih[i].priimek.toLowerCase()){
 					temp= tabelaIskanihZaposlenih[i-1];
 					tabelaIskanihZaposlenih[i-1]=tabelaIskanihZaposlenih[i];
 					tabelaIskanihZaposlenih[i]=temp;
@@ -377,7 +385,7 @@ function sortirajTabeloZaposlenih(){
 		console.log("Sortiram tabelo zaposlenih!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
-				if(tabelaIskanihZaposlenih[i-1].naslov > tabelaIskanihZaposlenih[i].naslov){
+				if(tabelaIskanihZaposlenih[i-1].naslov.toLowerCase() > tabelaIskanihZaposlenih[i].naslov.toLowerCase()){
 					temp= tabelaIskanihZaposlenih[i-1];
 					tabelaIskanihZaposlenih[i-1]=tabelaIskanihZaposlenih[i];
 					tabelaIskanihZaposlenih[i]=temp;
@@ -393,7 +401,7 @@ function sortirajTabeloZaposlenih(){
 		console.log("Sortiram tabelo zaposlenih!");
 		for(var interval=0; interval<tabelaIskanihZaposlenih.length; interval++){
 			for(var i=1; i<tabelaIskanihZaposlenih.length; i++){
-				if(tabelaIskanihZaposlenih[i-1].delMesto > tabelaIskanihZaposlenih[i].delMesto){
+				if(tabelaIskanihZaposlenih[i-1].delMesto.toLowerCase() > tabelaIskanihZaposlenih[i].delMesto.toLowerCase()){
 					temp= tabelaIskanihZaposlenih[i-1];
 					tabelaIskanihZaposlenih[i-1]=tabelaIskanihZaposlenih[i];
 					tabelaIskanihZaposlenih[i]=temp;
@@ -418,11 +426,23 @@ function gumb_posljiEmail(){
 	$("#poslji-email").click(function(){
 		var seznamEmailov=kreirajSeznamMailovZaPosiljanje();
 		//console.log(kreirajSeznamMailovZaPosiljanje());
-		$("#poslji-email-povezava").attr({
-			"href" : "mailto:"+seznamEmailov
-		});
+		console.log("Seznam emailov je: " + seznamEmailov);
+		if(seznamEmailov != -1){
+			$("#poslji-email-povezava").attr({
+				"href" : "mailto:"+seznamEmailov
+				
+			});
+			console.log("KOrak 2");
+			
+			$("#poslji-email-povezava").click();
+			//$("#poslji-email-povezava").removeAttr("href");
+			console.log("KOrak 3");
 
-		$("#poslji-email-povezava").click();
+		}else{
+			$("#poslji-email-povezava").removeAttr("href");
+			return;
+		}
+		
 	});
 }
 
@@ -434,22 +454,39 @@ function kreirajSeznamMailovZaPosiljanje(){
 	console.log("izbrani so " + tabelaIndeksov);
     var seznamMailov="";
     var poz;
-    for(var j=0; j<tabelaIndeksov.length;j++){
-    	poz=tabelaIndeksov[j];
-    	for(var i=0; i< tabelaIskanihZaposlenih[poz].email.length; i++){
-    		if(i== tabelaIskanihZaposlenih[poz].email.length-1  && j== tabelaIndeksov.length-1 && tabelaIskanihZaposlenih[poz].email[i]!=undefined){
-    			
-    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i];
-    			break;
-    		}
-    		if(tabelaIskanihZaposlenih[poz].email[i]!=undefined){
-    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i]+",";
-    		}
-    		
-    	}
-    }
+
+    if(tabelaIndeksov.length == 0){
+    	clearTimeout(timer6);
+    	console.log("Tabela indeksov je prazna!");
+    	$("#izbrisiZaposlenega-okvir").css({"display" : ""});
+    	$("#izbrisiZaposlenega-okvir").attr({"class" : "fade-in obvestilo bg-danger"});
+    	$("#izbrisiZaposlenega-okvir").html("NAPAKA! Seznam e-mailov za pošiljanje je prazen!");
+    	timer6 = setTimeout(function() {
+		    $("#izbrisiZaposlenega-okvir").hide('slow');
+		}, 4000);
+
+    	return -1;
+    }else{
+    	for(var j=0; j<tabelaIndeksov.length;j++){
+	    	poz=tabelaIndeksov[j];
+	    	for(var i=0; i< tabelaIskanihZaposlenih[poz].email.length; i++){
+	    		if(i== tabelaIskanihZaposlenih[poz].email.length-1  && j== tabelaIndeksov.length-1 && tabelaIskanihZaposlenih[poz].email[i]!=undefined){
+	    			
+	    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i];
+	    			break;
+	    		}
+	    		if(tabelaIskanihZaposlenih[poz].email[i]!=undefined){
+	    			seznamMailov+= tabelaIskanihZaposlenih[poz].email[i]+",";
+	    		}
+	    		
+	    	}
+	    }	
+
     console.log("Izbrani emaili so: " + seznamMailov);
     return seznamMailov;
+    }
+
+    
 }
 
 
