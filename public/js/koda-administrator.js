@@ -1053,7 +1053,7 @@ function gumb_izbrisiZaposlenega(){
 								$("#izbrisiZaposlenega-okvir").css({
 								"display" : ""
 								});
-								$("#izbrisiZaposlenega-okvir span").html(odgovor.sporocilo);
+								$("#izbrisiZaposlenega-okvir").html(odgovor.sporocilo);
 
 								timer5 = setTimeout(function() {
 					            $("#izbrisiZaposlenega-okvir").hide('slow');
@@ -1064,7 +1064,7 @@ function gumb_izbrisiZaposlenega(){
 								$("#izbrisiZaposlenega-okvir").css({
 								"display" : ""
 								});
-								$("#izbrisiZaposlenega-okvir span").text(odgovor.sporocilo);
+								$("#izbrisiZaposlenega-okvir").text(odgovor.sporocilo);
 
 								timer5= setTimeout(function() {
 					            $("#izbrisiZaposlenega-okvir").hide('slow');
