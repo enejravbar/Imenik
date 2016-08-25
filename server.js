@@ -35,7 +35,7 @@ streznik.use(
 );
 
 var pool = mysql.createPool({
-    host: '10.10.101.71',
+    host: 'localhost',
     user: 'imenik',
     password: 'imenik',
     database: 'imenik',
